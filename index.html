@@ -11,29 +11,36 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:       #f0eff6;
-      --surface:  #ffffff;
-      --border:   rgba(0,0,0,0.06);
-      --shadow:   0 2px 12px rgba(80,70,140,0.08);
-      --shadow-lg:0 8px 32px rgba(80,70,140,0.12);
+      --bg:          #f2ece0;
+      --surface:     #faf7f2;
+      --surface2:    #f5efe4;
+      --border:      rgba(160,120,70,0.13);
+      --border-hi:   rgba(160,120,70,0.22);
+      --shadow:      0 2px 14px rgba(100,65,20,0.08);
+      --shadow-lg:   0 8px 32px rgba(100,65,20,0.13);
+      --shadow-hero: 0 16px 48px rgba(80,45,10,0.22);
 
-      --text:     #111027;
-      --text-2:   #6d6b85;
-      --text-3:   #b4b2c8;
+      --text:        #2a1a08;
+      --text-2:      #7a5c38;
+      --text-3:      #bba07a;
 
-      --income:   #05c072;
-      --income-bg:#e8faf3;
-      --income-dk:#048f55;
+      --income:      #2a8c62;
+      --income-bg:   #edf7f3;
+      --income-dk:   #1e6b4a;
 
-      --expense:  #ff4560;
-      --expense-bg:#fff0f3;
-      --expense-dk:#cc2a45;
+      --expense:     #c44d28;
+      --expense-bg:  #fdf1ec;
+      --expense-dk:  #a33a1a;
 
-      --accent:   #5c55f5;
-      --accent-bg:#eeecff;
-      --accent-dk:#3d38cc;
+      --accent:      #a0682a;
+      --accent-bg:   #fdf3e4;
+      --accent-lt:   #e8c48a;
 
-      --r:  18px;
+      --wood-dark:   #5c3820;
+      --wood-mid:    #8b5c34;
+      --wood-light:  #c49460;
+
+      --r:    18px;
       --r-sm: 12px;
     }
 
@@ -45,11 +52,23 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    /* ── 배경 텍스처 느낌 ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(200,160,90,0.12) 0%, transparent 55%),
+        radial-gradient(ellipse at 80% 90%, rgba(180,120,60,0.1) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
     /* ── Loading ── */
     .loading-bar {
       position: fixed; top: 0; left: 0;
       height: 3px; width: 0;
-      background: linear-gradient(90deg, var(--accent), #a78bfa, var(--income));
+      background: linear-gradient(90deg, var(--wood-dark), var(--wood-light), var(--accent-lt));
       border-radius: 0 99px 99px 0;
       transition: width 0.3s;
       z-index: 200;
@@ -61,8 +80,8 @@
     .toast {
       position: fixed; bottom: 28px; left: 50%;
       transform: translateX(-50%) translateY(14px);
-      background: var(--text);
-      color: #fff;
+      background: var(--wood-dark);
+      color: #f5efe4;
       padding: 10px 22px;
       border-radius: 99px;
       font-size: 0.82rem;
@@ -73,15 +92,15 @@
       pointer-events: none;
       white-space: nowrap;
       z-index: 199;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      box-shadow: 0 4px 20px rgba(80,40,10,0.25);
     }
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast.show  { opacity: 1; transform: translateX(-50%) translateY(0); }
     .toast.error { background: var(--expense); }
 
     /* ── Header ── */
     header {
       position: sticky; top: 0; z-index: 50;
-      background: rgba(240,239,246,0.88);
+      background: rgba(242,236,224,0.88);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid var(--border);
@@ -90,29 +109,31 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
+      position: sticky;
     }
 
     .logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
       font-size: 1.05rem;
       font-weight: 800;
-      letter-spacing: -0.7px;
-      color: var(--text);
+      letter-spacing: -0.6px;
+      color: var(--wood-dark);
     }
 
-    .logo span {
-      display: inline-block;
-      width: 9px; height: 9px;
-      border-radius: 50%;
-      background: var(--accent);
-      margin-right: 7px;
-      vertical-align: middle;
-      margin-bottom: 2px;
+    .logo-icon {
+      width: 30px; height: 30px;
+      background: linear-gradient(135deg, var(--wood-dark), var(--wood-light));
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem;
+      box-shadow: 0 2px 8px rgba(92,56,32,0.3);
     }
 
     .month-nav {
       display: flex;
       align-items: center;
-      gap: 0;
       background: var(--surface);
       border: 1px solid var(--border);
       border-radius: 99px;
@@ -122,16 +143,15 @@
 
     .nav-btn {
       width: 28px; height: 28px;
-      border: none;
-      background: transparent;
-      color: var(--text-2);
+      border: none; background: transparent;
+      color: var(--text-3);
       border-radius: 50%;
       cursor: pointer;
       font-size: 1rem;
       display: flex; align-items: center; justify-content: center;
       transition: all 0.15s;
     }
-    .nav-btn:hover { background: var(--bg); color: var(--accent); }
+    .nav-btn:hover { background: var(--accent-bg); color: var(--accent); }
 
     .month-nav span {
       font-size: 0.82rem;
@@ -145,6 +165,7 @@
 
     /* ── Layout ── */
     .container {
+      position: relative; z-index: 1;
       max-width: 680px;
       margin: 0 auto;
       padding: 20px 16px 64px;
@@ -155,53 +176,59 @@
 
     /* ── Hero Card ── */
     .hero {
-      background: linear-gradient(145deg, #4a44f2 0%, #7c3aed 55%, #c026d3 100%);
+      background: linear-gradient(145deg, #4a2810 0%, #7a4825 45%, #b07840 80%, #c89850 100%);
       border-radius: 26px;
       padding: 30px 28px 26px;
-      color: #fff;
+      color: #fdf5e8;
       position: relative;
       overflow: hidden;
-      box-shadow: 0 12px 40px rgba(92,85,245,0.35);
+      box-shadow: var(--shadow-hero);
     }
 
-    /* 배경 장식 원 */
+    /* 우드 결 느낌 레이어 */
     .hero::before {
       content: '';
-      position: absolute;
-      width: 260px; height: 260px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.07);
-      top: -80px; right: -60px;
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        100deg,
+        transparent,
+        transparent 40px,
+        rgba(255,255,255,0.015) 40px,
+        rgba(255,255,255,0.015) 41px
+      );
+      pointer-events: none;
     }
+
     .hero::after {
       content: '';
       position: absolute;
-      width: 160px; height: 160px;
+      width: 280px; height: 280px;
       border-radius: 50%;
       background: rgba(255,255,255,0.05);
-      bottom: -50px; left: 40px;
+      top: -90px; right: -80px;
+      pointer-events: none;
     }
 
     .hero-month {
-      font-size: 0.75rem;
+      font-size: 0.73rem;
       font-weight: 600;
-      letter-spacing: 0.5px;
-      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.4px;
+      color: rgba(253,245,232,0.55);
       margin-bottom: 8px;
     }
 
     .hero-balance {
-      font-size: 2.8rem;
+      font-size: 2.9rem;
       font-weight: 900;
-      letter-spacing: -2px;
+      letter-spacing: -2.5px;
       line-height: 1;
       margin-bottom: 4px;
       position: relative;
     }
 
     .hero-sub {
-      font-size: 0.78rem;
-      color: rgba(255,255,255,0.55);
+      font-size: 0.75rem;
+      color: rgba(253,245,232,0.45);
       margin-bottom: 24px;
     }
 
@@ -213,48 +240,47 @@
     }
 
     .hero-stat {
-      background: rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.12);
       border-radius: 14px;
       padding: 12px 14px;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(6px);
     }
 
     .hero-stat-label {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 600;
-      color: rgba(255,255,255,0.6);
+      color: rgba(253,245,232,0.55);
       margin-bottom: 4px;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
     }
 
-    .stat-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-    }
-    .stat-dot.income  { background: #6dffc0; }
-    .stat-dot.expense { background: #ff8fa3; }
+    .stat-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .stat-dot.income  { background: #7dffc0; }
+    .stat-dot.expense { background: #ffb39a; }
 
     .hero-stat-val {
       font-size: 1.05rem;
       font-weight: 800;
-      letter-spacing: -0.5px;
-      color: #fff;
+      letter-spacing: -0.6px;
+      color: #fdf5e8;
     }
 
-    /* ── Cards ── */
+    /* ── White Cards ── */
     .card {
       background: var(--surface);
       border-radius: var(--r);
+      border: 1px solid var(--border);
       box-shadow: var(--shadow);
       padding: 20px;
     }
 
     .card-title {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
       color: var(--text-3);
       margin-bottom: 14px;
@@ -269,7 +295,7 @@
 
     .chart-wrap {
       position: relative;
-      height: 175px;
+      height: 180px;
       display: flex; align-items: center; justify-content: center;
     }
 
@@ -285,7 +311,7 @@
     .type-toggle {
       display: flex;
       gap: 6px;
-      background: var(--bg);
+      background: var(--surface2);
       border-radius: 12px;
       padding: 4px;
       margin-bottom: 14px;
@@ -309,13 +335,12 @@
     .type-toggle button.active-income {
       background: var(--income-bg);
       color: var(--income-dk);
-      box-shadow: 0 1px 4px rgba(5,192,114,0.2);
+      box-shadow: 0 1px 6px rgba(42,140,98,0.15);
     }
-
     .type-toggle button.active-expense {
       background: var(--expense-bg);
       color: var(--expense-dk);
-      box-shadow: 0 1px 4px rgba(255,69,96,0.2);
+      box-shadow: 0 1px 6px rgba(196,77,40,0.15);
     }
 
     .form-grid {
@@ -333,7 +358,7 @@
       font-size: 0.875rem;
       font-family: inherit;
       font-weight: 500;
-      background: var(--bg);
+      background: var(--surface2);
       color: var(--text);
       outline: none;
       transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
@@ -364,13 +389,12 @@
       font-family: inherit;
       letter-spacing: -0.3px;
       cursor: pointer;
-      background: var(--accent);
-      color: #fff;
-      box-shadow: 0 4px 16px rgba(92,85,245,0.3);
+      background: linear-gradient(135deg, var(--wood-dark) 0%, var(--wood-mid) 100%);
+      color: #fdf5e8;
+      box-shadow: 0 4px 16px rgba(92,56,32,0.28);
       transition: all 0.15s;
     }
-
-    .btn-add:hover  { background: var(--accent-dk); box-shadow: 0 6px 22px rgba(92,85,245,0.38); }
+    .btn-add:hover  { opacity: 0.92; box-shadow: 0 6px 22px rgba(92,56,32,0.36); }
     .btn-add:active { transform: scale(0.98); }
     .btn-add:disabled { opacity: 0.45; cursor: not-allowed; }
 
@@ -382,9 +406,9 @@
     }
 
     .list-title {
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: 0.4px;
+      letter-spacing: 0.5px;
       text-transform: uppercase;
       color: var(--text-3);
     }
@@ -400,28 +424,28 @@
       color: var(--text-2);
       outline: none;
       cursor: pointer;
-      letter-spacing: -0.2px;
     }
-
     .filter-select:focus { border-color: var(--accent); }
 
     .tx-list { display: flex; flex-direction: column; gap: 6px; }
 
     .tx-item {
       background: var(--surface);
+      border: 1px solid var(--border);
       border-radius: 16px;
       padding: 13px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
       box-shadow: var(--shadow);
-      animation: slideUp 0.2s cubic-bezier(.34,1.4,.64,1) both;
-      transition: box-shadow 0.15s, transform 0.15s;
+      animation: slideUp 0.22s cubic-bezier(.34,1.4,.64,1) both;
+      transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
     }
 
     .tx-item:hover {
       box-shadow: var(--shadow-lg);
       transform: translateY(-1px);
+      border-color: var(--border-hi);
     }
 
     @keyframes slideUp {
@@ -436,14 +460,13 @@
       font-size: 1.1rem;
       flex-shrink: 0;
     }
-
     .tx-icon.income  { background: var(--income-bg); }
     .tx-icon.expense { background: var(--expense-bg); }
 
     .tx-info { flex: 1; min-width: 0; }
 
     .tx-desc {
-      font-size: 0.88rem;
+      font-size: 0.875rem;
       font-weight: 700;
       letter-spacing: -0.3px;
       color: var(--text);
@@ -460,30 +483,28 @@
     }
 
     .tx-cat {
-      font-size: 0.68rem;
+      font-size: 0.67rem;
       font-weight: 700;
       color: var(--text-3);
-      background: var(--bg);
+      background: var(--surface2);
       border-radius: 99px;
       padding: 1px 7px;
     }
 
-    .tx-date { font-size: 0.68rem; font-weight: 500; color: var(--text-3); }
+    .tx-date { font-size: 0.67rem; font-weight: 500; color: var(--text-3); }
 
     .tx-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
     .tx-amount {
-      font-size: 0.92rem;
+      font-size: 0.9rem;
       font-weight: 800;
       letter-spacing: -0.4px;
     }
-
     .tx-amount.income  { color: var(--income-dk); }
     .tx-amount.expense { color: var(--expense); }
 
     .tx-delete {
-      background: none;
-      border: none;
+      background: none; border: none;
       color: var(--text-3);
       cursor: pointer;
       width: 26px; height: 26px;
@@ -493,7 +514,6 @@
       transition: all 0.15s;
       opacity: 0;
     }
-
     .tx-item:hover .tx-delete { opacity: 1; }
     .tx-delete:hover { background: var(--expense-bg); color: var(--expense); }
 
@@ -502,7 +522,7 @@
       padding: 52px 20px;
       color: var(--text-3);
     }
-    .empty-icon { font-size: 2.4rem; margin-bottom: 10px; opacity: 0.45; }
+    .empty-icon { font-size: 2.2rem; margin-bottom: 10px; opacity: 0.4; }
     .empty-text { font-size: 0.85rem; font-weight: 600; }
 
     ::-webkit-scrollbar { width: 4px; }
@@ -516,7 +536,10 @@
 <div class="toast" id="toast"></div>
 
 <header>
-  <div class="logo"><span></span>가계부</div>
+  <div class="logo">
+    <div class="logo-icon">🌿</div>
+    가계부
+  </div>
   <div class="month-nav">
     <button class="nav-btn" id="prevMonth">&#8249;</button>
     <span id="monthLabel"></span>
@@ -568,20 +591,12 @@
       <button id="btnExpense" onclick="setType('expense')">↓ 지출</button>
     </div>
     <div class="form-grid">
-      <div class="field">
-        <input type="text" id="inputDesc" placeholder="내용 (예: 점심식사)" maxlength="40" />
-      </div>
-      <div class="field">
-        <select id="inputCategory"></select>
-      </div>
+      <div class="field"><input type="text" id="inputDesc" placeholder="내용 (예: 점심식사)" maxlength="40" /></div>
+      <div class="field"><select id="inputCategory"></select></div>
     </div>
     <div class="form-grid">
-      <div class="field">
-        <input type="number" id="inputAmount" placeholder="금액 (원)" min="1" />
-      </div>
-      <div class="field">
-        <input type="date" id="inputDate" />
-      </div>
+      <div class="field"><input type="number" id="inputAmount" placeholder="금액 (원)" min="1" /></div>
+      <div class="field"><input type="date" id="inputDate" /></div>
     </div>
     <button class="btn-add" id="btnAdd" onclick="addTransaction()">추가하기</button>
   </div>
@@ -616,8 +631,8 @@
   };
 
   const CAT_COLORS = [
-    '#5c55f5','#ff4560','#05c072','#f59e0b','#3b82f6',
-    '#ec4899','#10b981','#f97316','#06b6d4','#8b5cf6',
+    '#8b5c34','#c44d28','#2a8c62','#c4941a','#5b8ac4',
+    '#b85c8a','#4aaa70','#c47a28','#4a9cc4','#9c5cb8',
   ];
 
   let currentType = 'income';
@@ -627,7 +642,7 @@
   let barChartInst = null;
   let donutChartInst = null;
 
-  Chart.defaults.color = '#b4b2c8';
+  Chart.defaults.color = '#bba07a';
   Chart.defaults.font.family = "'Pretendard Variable', 'Pretendard', -apple-system, sans-serif";
 
   function fmt(n) { return '₩' + Math.abs(n).toLocaleString('ko-KR'); }
@@ -703,9 +718,7 @@
 
     document.getElementById('totalIncome').textContent  = fmt(income);
     document.getElementById('totalExpense').textContent = fmt(expense);
-
-    const balEl = document.getElementById('totalBalance');
-    balEl.textContent = (balance < 0 ? '−' : '') + fmt(balance);
+    document.getElementById('totalBalance').textContent = (balance < 0 ? '−' : '') + fmt(balance);
 
     await renderBarChart();
     renderDonutChart(txCache, expense);
@@ -733,26 +746,26 @@
       data: {
         labels,
         datasets: [
-          { label:'수입', data:incomes,  backgroundColor:'rgba(5,192,114,0.8)',  borderRadius:5, borderSkipped:false },
-          { label:'지출', data:expenses, backgroundColor:'rgba(255,69,96,0.75)', borderRadius:5, borderSkipped:false },
+          { label:'수입', data:incomes,  backgroundColor:'rgba(42,140,98,0.75)',  borderRadius:5, borderSkipped:false },
+          { label:'지출', data:expenses, backgroundColor:'rgba(196,77,40,0.75)', borderRadius:5, borderSkipped:false },
         ],
       },
       options: {
         responsive:true, maintainAspectRatio:false,
         interaction:{ mode:'index', intersect:false },
         plugins:{
-          legend:{ position:'bottom', labels:{ boxWidth:8, boxHeight:8, borderRadius:3, padding:12, font:{size:10,weight:'700'}, color:'#b4b2c8' } },
+          legend:{ position:'bottom', labels:{ boxWidth:8, boxHeight:8, borderRadius:3, padding:12, font:{size:10,weight:'700'}, color:'#bba07a' } },
           tooltip:{
-            backgroundColor:'#111027', borderColor:'rgba(0,0,0,0.06)', borderWidth:1,
+            backgroundColor:'#2a1a08', borderColor:'rgba(160,120,70,0.2)', borderWidth:1,
             padding:10, cornerRadius:10,
             callbacks:{ label: c => ` ${c.dataset.label}: ${fmt(c.parsed.y)}` },
           },
         },
         scales:{
-          x:{ grid:{display:false}, ticks:{font:{size:10,weight:'600'}, color:'#b4b2c8'}, border:{display:false} },
+          x:{ grid:{display:false}, ticks:{font:{size:10,weight:'600'}, color:'#bba07a'}, border:{display:false} },
           y:{
-            grid:{color:'rgba(0,0,0,0.04)'}, border:{display:false},
-            ticks:{ font:{size:9,weight:'600'}, color:'#b4b2c8', callback: v => v===0?'0':v>=1000000?(v/1000000).toFixed(0)+'M':(v/1000).toFixed(0)+'K' },
+            grid:{color:'rgba(160,120,70,0.07)'}, border:{display:false},
+            ticks:{ font:{size:9,weight:'600'}, color:'#bba07a', callback: v => v===0?'0':v>=1000000?(v/1000000).toFixed(0)+'M':(v/1000).toFixed(0)+'K' },
           },
         },
       },
@@ -784,14 +797,14 @@
       type: 'doughnut',
       data: {
         labels: cats,
-        datasets: [{ data:vals, backgroundColor:cats.map((_,i)=>CAT_COLORS[i%CAT_COLORS.length]), borderWidth:2, borderColor:'#fff', hoverOffset:5 }],
+        datasets: [{ data:vals, backgroundColor:cats.map((_,i)=>CAT_COLORS[i%CAT_COLORS.length]), borderWidth:3, borderColor:['#faf7f2'], hoverOffset:5 }],
       },
       options: {
         responsive:true, maintainAspectRatio:false, cutout:'70%',
         plugins:{
-          legend:{ position:'bottom', labels:{ boxWidth:7, boxHeight:7, borderRadius:2, padding:8, font:{size:9,weight:'700'}, color:'#b4b2c8' } },
+          legend:{ position:'bottom', labels:{ boxWidth:7, boxHeight:7, borderRadius:2, padding:8, font:{size:9,weight:'700'}, color:'#bba07a' } },
           tooltip:{
-            backgroundColor:'#111027', borderColor:'rgba(0,0,0,0.06)', borderWidth:1,
+            backgroundColor:'#2a1a08', borderColor:'rgba(160,120,70,0.2)', borderWidth:1,
             padding:10, cornerRadius:10,
             callbacks:{ label: c => ` ${fmt(c.parsed)}` },
           },
@@ -840,8 +853,7 @@
     if (!date)               { toast('날짜를 선택하세요.', true); return; }
 
     const btn = document.getElementById('btnAdd');
-    btn.disabled = true;
-    loading(true);
+    btn.disabled = true; loading(true);
 
     const { error } = await db.from('transactions').insert({ type:currentType, description:desc, amount, category:cat, date });
     btn.disabled = false;
