@@ -4,173 +4,299 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>가계부</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0f0e17;
-      --surface: #1a1828;
-      --surface2: #231f35;
-      --border: rgba(255,255,255,0.07);
-      --income: #a78bfa;
-      --income-dim: rgba(167,139,250,0.12);
-      --expense: #fb7185;
-      --expense-dim: rgba(251,113,133,0.12);
-      --positive: #34d399;
-      --text: #e2e0f0;
-      --text-muted: #6b6880;
-      --text-sub: #9d9ab0;
-      --radius: 16px;
+      --bg:          #08070e;
+      --glass:       rgba(255,255,255,0.04);
+      --glass-hover: rgba(255,255,255,0.06);
+      --border:      rgba(255,255,255,0.08);
+      --border-hi:   rgba(255,255,255,0.14);
+      --text:        #f0eefa;
+      --text-2:      #8c8aa6;
+      --text-3:      #3e3c55;
+      --green:       #4ade80;
+      --green-dim:   rgba(74,222,128,0.1);
+      --green-glow:  rgba(74,222,128,0.2);
+      --red:         #f87171;
+      --red-dim:     rgba(248,113,113,0.1);
+      --red-glow:    rgba(248,113,113,0.2);
+      --purple:      #c4b5fd;
+      --purple-dim:  rgba(196,181,253,0.1);
+      --r: 20px;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-family: 'Inter', -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
+      overflow-x: hidden;
     }
 
+    /* ─── Aurora Background ─── */
+    .aurora {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .aurora-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(90px);
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+
+    .aurora-blob:nth-child(1) {
+      width: 500px; height: 500px;
+      top: -150px; left: -100px;
+      background: radial-gradient(circle, rgba(109,40,217,0.35), transparent 70%);
+      animation-duration: 20s;
+    }
+
+    .aurora-blob:nth-child(2) {
+      width: 400px; height: 400px;
+      top: 100px; right: -100px;
+      background: radial-gradient(circle, rgba(219,39,119,0.25), transparent 70%);
+      animation-duration: 24s;
+      animation-delay: -8s;
+    }
+
+    .aurora-blob:nth-child(3) {
+      width: 350px; height: 350px;
+      bottom: 100px; left: 30%;
+      background: radial-gradient(circle, rgba(8,145,178,0.2), transparent 70%);
+      animation-duration: 28s;
+      animation-delay: -14s;
+    }
+
+    @keyframes drift {
+      0%   { transform: translate(0, 0) scale(1); }
+      33%  { transform: translate(40px, -30px) scale(1.05); }
+      66%  { transform: translate(-20px, 50px) scale(0.95); }
+      100% { transform: translate(30px, 20px) scale(1.03); }
+    }
+
+    /* ─── Loading bar ─── */
+    .loading-bar {
+      position: fixed; top: 0; left: 0;
+      height: 2px; width: 0;
+      background: linear-gradient(90deg, #7c3aed, #ec4899, #06b6d4);
+      transition: width 0.3s;
+      z-index: 200;
+    }
+    .loading-bar.active { width: 70%; }
+    .loading-bar.done   { width: 100%; opacity: 0; transition: width 0.1s, opacity 0.4s 0.1s; }
+
+    /* ─── Toast ─── */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: rgba(20,18,32,0.92);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-hi);
+      color: var(--text);
+      padding: 10px 22px;
+      border-radius: 99px;
+      font-size: 0.83rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 199;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ─── Header ─── */
     header {
-      background: linear-gradient(135deg, #1e1b35 0%, #16132a 100%);
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(8,7,14,0.7);
+      backdrop-filter: blur(24px);
       border-bottom: 1px solid var(--border);
-      padding: 18px 24px;
+      padding: 14px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      backdrop-filter: blur(12px);
     }
 
     .logo {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: -0.6px;
+      color: var(--text);
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 1.2rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      background: linear-gradient(90deg, #a78bfa, #fb7185);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      gap: 8px;
     }
 
-    .logo .emoji { -webkit-text-fill-color: initial; font-size: 1.3rem; }
+    .logo-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #ec4899);
+      box-shadow: 0 0 8px rgba(124,58,237,0.6);
+    }
 
     .month-nav {
       display: flex;
       align-items: center;
-      gap: 10px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--text-sub);
-    }
-
-    .month-nav button {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid var(--border);
-      color: var(--text-sub);
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      cursor: pointer;
-      font-size: 1.1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.15s;
-    }
-
-    .month-nav button:hover {
-      background: rgba(167,139,250,0.15);
-      border-color: var(--income);
-      color: var(--income);
-    }
-
-    .container { max-width: 680px; margin: 0 auto; padding: 24px 16px 48px; }
-
-    /* Loading overlay */
-    .loading-bar {
-      position: fixed;
-      top: 0; left: 0;
-      height: 2px;
-      width: 0;
-      background: linear-gradient(90deg, #a78bfa, #fb7185);
-      transition: width 0.3s;
-      z-index: 100;
-    }
-
-    .loading-bar.active { width: 70%; }
-    .loading-bar.done   { width: 100%; opacity: 0; transition: width 0.1s, opacity 0.3s 0.1s; }
-
-    /* Summary */
-    .summary {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
       gap: 12px;
-      margin-bottom: 24px;
     }
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 18px 16px;
+    .month-nav span {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-2);
+      min-width: 80px;
       text-align: center;
+    }
+
+    .nav-btn {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--glass);
+      color: var(--text-2);
+      cursor: pointer;
+      font-size: 1rem;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .nav-btn:hover {
+      border-color: var(--purple);
+      background: var(--purple-dim);
+      color: var(--purple);
+    }
+
+    /* ─── Layout ─── */
+    .container {
+      position: relative; z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 28px 16px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ─── Hero Balance Card ─── */
+    .hero {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 36px 32px 28px;
       position: relative;
       overflow: hidden;
+      backdrop-filter: blur(20px);
     }
 
-    .card.income::before { content:''; position:absolute; inset:0; background:var(--income-dim); border-radius:inherit; }
-    .card.expense::before { content:''; position:absolute; inset:0; background:var(--expense-dim); border-radius:inherit; }
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -60px; right: -60px;
+      width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(124,58,237,0.15), transparent 70%);
+      pointer-events: none;
+    }
 
-    .card .label {
-      font-size: 0.72rem;
+    .hero-label {
+      font-size: 0.75rem;
       font-weight: 600;
-      letter-spacing: 0.8px;
+      letter-spacing: 1px;
       text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 8px;
+      color: var(--text-3);
+      margin-bottom: 10px;
     }
 
-    .card .amount { font-size: 1.1rem; font-weight: 800; position: relative; }
-    .card.income .amount  { color: var(--income); }
-    .card.expense .amount { color: var(--expense); }
-    .card.balance .amount { color: var(--positive); }
-    .card.balance .amount.negative { color: var(--expense); }
+    .hero-balance {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: -2px;
+      line-height: 1;
+      color: var(--text);
+      margin-bottom: 6px;
+      transition: color 0.3s;
+    }
 
-    /* Charts */
+    .hero-balance.negative { color: var(--red); }
+
+    .hero-balance-sub {
+      font-size: 0.8rem;
+      color: var(--text-2);
+      margin-bottom: 28px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .hero-stat {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    .stat-arrow {
+      width: 30px; height: 30px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .hero-stat.income .stat-arrow  { background: var(--green-dim); color: var(--green); }
+    .hero-stat.expense .stat-arrow { background: var(--red-dim);   color: var(--red); }
+
+    .stat-label { font-size: 0.7rem; font-weight: 500; color: var(--text-2); margin-bottom: 2px; }
+    .stat-val   { font-size: 0.95rem; font-weight: 800; letter-spacing: -0.4px; }
+    .hero-stat.income .stat-val  { color: var(--green); }
+    .hero-stat.expense .stat-val { color: var(--red); }
+
+    /* ─── Charts ─── */
     .charts {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 14px;
-      margin-bottom: 24px;
+      gap: 16px;
     }
 
     .chart-card {
-      background: var(--surface);
+      background: var(--glass);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
+      border-radius: var(--r);
       padding: 20px;
+      backdrop-filter: blur(20px);
     }
 
-    .chart-title {
-      font-size: 0.78rem;
+    .card-title {
+      font-size: 0.7rem;
       font-weight: 700;
-      letter-spacing: 0.6px;
+      letter-spacing: 0.8px;
       text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 16px;
+      color: var(--text-3);
+      margin-bottom: 14px;
     }
 
     .chart-wrap {
       position: relative;
-      height: 170px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      height: 180px;
+      display: flex; align-items: center; justify-content: center;
     }
 
     .donut-center {
@@ -178,243 +304,315 @@
       text-align: center;
       pointer-events: none;
     }
+    .dc-val   { font-size: 0.92rem; font-weight: 800; color: var(--text); }
+    .dc-label { font-size: 0.6rem; color: var(--text-2); margin-top: 2px; }
 
-    .donut-center .dc-val   { font-size: 1rem; font-weight: 800; color: var(--text); }
-    .donut-center .dc-label { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
-
-    /* Form */
+    /* ─── Form ─── */
     .form-card {
-      background: var(--surface);
+      background: var(--glass);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 22px;
-      margin-bottom: 24px;
-    }
-
-    .section-title {
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.6px;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 16px;
+      border-radius: var(--r);
+      padding: 24px;
+      backdrop-filter: blur(20px);
     }
 
     .type-toggle {
       display: flex;
-      gap: 8px;
-      margin-bottom: 14px;
-      background: var(--bg);
-      border-radius: 12px;
+      gap: 6px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 14px;
       padding: 4px;
+      margin-bottom: 16px;
     }
 
     .type-toggle button {
       flex: 1;
-      padding: 9px;
+      padding: 10px;
       border: none;
-      border-radius: 9px;
+      border-radius: 11px;
       background: transparent;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 700;
+      font-family: 'Inter', sans-serif;
       cursor: pointer;
-      color: var(--text-muted);
-      transition: all 0.2s;
+      color: var(--text-2);
+      transition: all 0.2s cubic-bezier(.34,1.56,.64,1);
     }
 
-    .type-toggle button.active-income  { background:var(--income-dim); color:var(--income); box-shadow:0 0 0 1px rgba(167,139,250,0.3); }
-    .type-toggle button.active-expense { background:var(--expense-dim); color:var(--expense); box-shadow:0 0 0 1px rgba(251,113,133,0.3); }
+    .type-toggle button.active-income {
+      background: var(--green-dim);
+      color: var(--green);
+      box-shadow: 0 0 0 1px rgba(74,222,128,0.25), 0 0 16px rgba(74,222,128,0.1);
+    }
 
-    .form-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .type-toggle button.active-expense {
+      background: var(--red-dim);
+      color: var(--red);
+      box-shadow: 0 0 0 1px rgba(248,113,113,0.25), 0 0 16px rgba(248,113,113,0.1);
+    }
 
-    .form-row input, .form-row select {
-      flex: 1;
-      padding: 11px 13px;
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .form-grid.single { grid-template-columns: 1fr; }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .field input, .field select {
+      padding: 11px 14px;
       border: 1px solid var(--border);
-      border-radius: 11px;
-      font-size: 0.88rem;
-      background: var(--surface2);
+      border-radius: 12px;
+      font-size: 0.875rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      background: rgba(0,0,0,0.25);
       color: var(--text);
       outline: none;
-      transition: border-color 0.15s;
+      transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
     }
 
-    .form-row input::placeholder { color: var(--text-muted); }
-    .form-row input:focus, .form-row select:focus { border-color: rgba(167,139,250,0.5); background: #1f1c30; }
-    .form-row select option { background: #1a1828; }
-    .form-row input[type="number"] { -moz-appearance: textfield; }
-    .form-row input[type="number"]::-webkit-outer-spin-button,
-    .form-row input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
+    .field input::placeholder { color: var(--text-3); }
+    .field select option       { background: #0f0e1a; }
+
+    .field input:focus, .field select:focus {
+      border-color: rgba(196,181,253,0.4);
+      background: rgba(196,181,253,0.04);
+      box-shadow: 0 0 0 3px rgba(196,181,253,0.08);
+    }
+
+    .field input[type="number"] { -moz-appearance: textfield; }
+    .field input[type="number"]::-webkit-outer-spin-button,
+    .field input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; }
 
     .btn-add {
       width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #7c3aed, #a855f7);
-      color: #fff;
+      margin-top: 8px;
+      padding: 13px;
       border: none;
-      border-radius: 11px;
-      font-size: 0.95rem;
+      border-radius: 14px;
+      font-size: 0.9rem;
       font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.2px;
       cursor: pointer;
-      transition: opacity 0.15s, transform 0.1s;
+      background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 50%, #a855f7 100%);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(109,40,217,0.35);
+      transition: opacity 0.15s, transform 0.12s, box-shadow 0.15s;
     }
 
-    .btn-add:hover { opacity: 0.9; }
+    .btn-add:hover  { opacity: 0.92; box-shadow: 0 6px 28px rgba(109,40,217,0.45); }
     .btn-add:active { transform: scale(0.98); }
-    .btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-add:disabled { opacity: 0.4; cursor: not-allowed; }
 
-    /* List */
+    /* ─── Transaction list ─── */
     .list-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 12px;
     }
 
-    .list-header .section-title { margin-bottom: 0; }
+    .list-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-3);
+    }
 
     .filter-select {
-      padding: 6px 10px;
+      padding: 6px 12px;
       border: 1px solid var(--border);
-      border-radius: 9px;
-      font-size: 0.78rem;
-      background: var(--surface);
-      color: var(--text-sub);
+      border-radius: 99px;
+      font-size: 0.75rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 600;
+      background: var(--glass);
+      color: var(--text-2);
       outline: none;
       cursor: pointer;
-    }
-
-    .tx-list { display: flex; flex-direction: column; gap: 8px; }
-
-    .tx-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 13px;
-      padding: 14px 16px;
-      display: flex;
-      align-items: center;
-      gap: 13px;
-      animation: fadeIn 0.2s ease;
       transition: border-color 0.15s;
     }
 
-    .tx-item:hover { border-color: rgba(167,139,250,0.2); }
+    .filter-select:hover { border-color: var(--border-hi); }
 
-    @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+    .tx-list { display: flex; flex-direction: column; gap: 6px; }
 
-    .tx-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 13px;
+    .tx-item {
+      background: var(--glass);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 13px 16px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 1.15rem;
+      gap: 12px;
+      animation: slideUp 0.2s cubic-bezier(.34,1.56,.64,1);
+      transition: border-color 0.15s, background 0.15s;
+      cursor: default;
+    }
+
+    .tx-item:hover {
+      background: var(--glass-hover);
+      border-color: var(--border-hi);
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    .tx-icon {
+      width: 40px; height: 40px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
       flex-shrink: 0;
     }
 
-    .tx-icon.income  { background: var(--income-dim); }
-    .tx-icon.expense { background: var(--expense-dim); }
+    .tx-icon.income  { background: var(--green-dim); box-shadow: 0 0 12px var(--green-glow); }
+    .tx-icon.expense { background: var(--red-dim);   box-shadow: 0 0 12px var(--red-glow); }
 
     .tx-info { flex: 1; min-width: 0; }
-    .tx-desc { font-size: 0.9rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .tx-meta { font-size: 0.73rem; color: var(--text-muted); margin-top: 3px; }
 
-    .tx-amount { font-size: 0.95rem; font-weight: 800; flex-shrink: 0; }
-    .tx-amount.income  { color: var(--income); }
-    .tx-amount.expense { color: var(--expense); }
+    .tx-desc {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      letter-spacing: -0.2px;
+    }
+
+    .tx-meta {
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .tx-cat {
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: var(--text-3);
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 1px 7px;
+    }
+
+    .tx-date { font-size: 0.68rem; color: var(--text-3); }
+
+    .tx-amount {
+      font-size: 0.9rem;
+      font-weight: 800;
+      letter-spacing: -0.4px;
+      flex-shrink: 0;
+    }
+
+    .tx-amount.income  { color: var(--green); }
+    .tx-amount.expense { color: var(--red); }
 
     .tx-delete {
       background: none;
       border: none;
-      color: var(--text-muted);
+      color: var(--text-3);
       cursor: pointer;
-      font-size: 0.85rem;
-      width: 26px;
-      height: 26px;
+      width: 28px; height: 28px;
       border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
       transition: all 0.15s;
       flex-shrink: 0;
+      opacity: 0;
     }
 
-    .tx-delete:hover { background: var(--expense-dim); color: var(--expense); }
+    .tx-item:hover .tx-delete { opacity: 1; }
+    .tx-delete:hover { background: var(--red-dim); color: var(--red); }
 
     .empty {
       text-align: center;
-      padding: 44px 20px;
-      color: var(--text-muted);
-      font-size: 0.88rem;
+      padding: 48px 20px;
+      color: var(--text-3);
     }
 
-    .empty .eicon { font-size: 2.5rem; margin-bottom: 10px; opacity: 0.5; }
+    .empty-icon { font-size: 2.2rem; margin-bottom: 12px; opacity: 0.4; }
+    .empty-text { font-size: 0.85rem; font-weight: 500; }
 
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(10px);
-      background: #2a2640;
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 10px 20px;
-      border-radius: 99px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      opacity: 0;
-      transition: all 0.25s;
-      pointer-events: none;
-      white-space: nowrap;
-      z-index: 99;
-    }
-
-    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-    ::-webkit-scrollbar { width: 6px; }
+    /* ─── Scrollbar ─── */
+    ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 99px; }
+    ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 99px; }
   </style>
 </head>
 <body>
 
+<!-- Aurora -->
+<div class="aurora">
+  <div class="aurora-blob"></div>
+  <div class="aurora-blob"></div>
+  <div class="aurora-blob"></div>
+</div>
+
 <div class="loading-bar" id="loadingBar"></div>
 <div class="toast" id="toast"></div>
 
+<!-- Header -->
 <header>
-  <div class="logo"><span class="emoji">💰</span> 가계부</div>
+  <div class="logo">
+    <div class="logo-dot"></div>
+    가계부
+  </div>
   <div class="month-nav">
-    <button id="prevMonth">&#8249;</button>
+    <button class="nav-btn" id="prevMonth">&#8249;</button>
     <span id="monthLabel"></span>
-    <button id="nextMonth">&#8250;</button>
+    <button class="nav-btn" id="nextMonth">&#8250;</button>
   </div>
 </header>
 
 <div class="container">
 
-  <div class="summary">
-    <div class="card income">
-      <div class="label">수입</div>
-      <div class="amount" id="totalIncome">₩0</div>
-    </div>
-    <div class="card expense">
-      <div class="label">지출</div>
-      <div class="amount" id="totalExpense">₩0</div>
-    </div>
-    <div class="card balance">
-      <div class="label">잔액</div>
-      <div class="amount" id="totalBalance">₩0</div>
+  <!-- Hero Balance -->
+  <div class="hero">
+    <div class="hero-label">이번 달 잔액</div>
+    <div class="hero-balance" id="totalBalance">₩0</div>
+    <div class="hero-balance-sub" id="heroSub">수입에서 지출을 제한 금액</div>
+    <div class="hero-stats">
+      <div class="hero-stat income">
+        <div class="stat-arrow">↑</div>
+        <div>
+          <div class="stat-label">수입</div>
+          <div class="stat-val" id="totalIncome">₩0</div>
+        </div>
+      </div>
+      <div class="hero-stat expense">
+        <div class="stat-arrow">↓</div>
+        <div>
+          <div class="stat-label">지출</div>
+          <div class="stat-val" id="totalExpense">₩0</div>
+        </div>
+      </div>
     </div>
   </div>
 
+  <!-- Charts -->
   <div class="charts">
     <div class="chart-card">
-      <div class="chart-title">6개월 트렌드</div>
-      <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+      <div class="card-title">6개월 트렌드</div>
+      <div class="chart-wrap">
+        <canvas id="barChart"></canvas>
+      </div>
     </div>
     <div class="chart-card">
-      <div class="chart-title">지출 카테고리</div>
+      <div class="card-title">지출 카테고리</div>
       <div class="chart-wrap">
         <div class="donut-center" id="donutCenter">
           <div class="dc-val" id="donutVal">₩0</div>
@@ -425,25 +623,34 @@
     </div>
   </div>
 
+  <!-- Form -->
   <div class="form-card">
-    <div class="section-title">내역 추가</div>
     <div class="type-toggle">
-      <button id="btnIncome" class="active-income" onclick="setType('income')">+ 수입</button>
-      <button id="btnExpense" onclick="setType('expense')">− 지출</button>
+      <button id="btnIncome" class="active-income" onclick="setType('income')">↑ 수입</button>
+      <button id="btnExpense" onclick="setType('expense')">↓ 지출</button>
     </div>
-    <div class="form-row">
-      <input type="text" id="inputDesc" placeholder="내용 (예: 점심식사)" maxlength="40" />
-      <select id="inputCategory"></select>
+    <div class="form-grid">
+      <div class="field">
+        <input type="text" id="inputDesc" placeholder="내용 (예: 점심식사)" maxlength="40" />
+      </div>
+      <div class="field">
+        <select id="inputCategory"></select>
+      </div>
     </div>
-    <div class="form-row">
-      <input type="number" id="inputAmount" placeholder="금액 (원)" min="1" />
-      <input type="date" id="inputDate" />
+    <div class="form-grid">
+      <div class="field">
+        <input type="number" id="inputAmount" placeholder="금액 (원)" min="1" />
+      </div>
+      <div class="field">
+        <input type="date" id="inputDate" />
+      </div>
     </div>
     <button class="btn-add" id="btnAdd" onclick="addTransaction()">추가하기</button>
   </div>
 
+  <!-- Transaction List -->
   <div class="list-header">
-    <div class="section-title" id="listTitle">이번 달 내역</div>
+    <div class="list-title" id="listTitle">이번 달 내역</div>
     <select class="filter-select" id="filterType" onchange="renderList()">
       <option value="all">전체</option>
       <option value="income">수입</option>
@@ -455,7 +662,6 @@
 </div>
 
 <script>
-  /* ── Supabase 초기화 ── */
   const SUPABASE_URL = 'https://taofterpawukrfzgnbkq.supabase.co';
   const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRhb2Z0ZXJwYXd1a3JmemduYmtxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0ODA0NzgsImV4cCI6MjA5NzA1NjQ3OH0.oXRNzDt3W-JMX8nwUXdiSmK7Hg0_2S5YVC_zPdEkU1o';
   const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -478,15 +684,14 @@
 
   let currentType = 'income';
   let currentYear, currentMonth;
-  let txCache = [];        // 현재 달 캐시
-  let trendCache = {};     // 월별 캐시 { 'YYYY-MM': [] }
+  let txCache = [];
+  let trendCache = {};
   let barChartInst = null;
   let donutChartInst = null;
 
-  Chart.defaults.color = '#6b6880';
-  Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
+  Chart.defaults.color = '#3e3c55';
+  Chart.defaults.font.family = "'Inter', -apple-system, sans-serif";
 
-  /* ── 유틸 ── */
   function fmt(n) { return '₩' + Math.abs(n).toLocaleString('ko-KR'); }
   function ym(y, m) { return `${y}-${String(m).padStart(2,'0')}`; }
   function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -500,12 +705,11 @@
   function toast(msg, isError = false) {
     const el = document.getElementById('toast');
     el.textContent = msg;
-    el.style.borderColor = isError ? 'rgba(251,113,133,0.3)' : 'rgba(167,139,250,0.3)';
+    el.style.color = isError ? '#f87171' : '#f0eefa';
     el.classList.add('show');
     setTimeout(() => el.classList.remove('show'), 2500);
   }
 
-  /* ── 초기화 ── */
   async function init() {
     const now = new Date();
     currentYear  = now.getFullYear();
@@ -532,26 +736,20 @@
     sel.innerHTML = CATEGORIES[type].map(c => `<option>${c}</option>`).join('');
   }
 
-  /* ── Supabase 조회 ── */
   async function fetchMonth(y, m) {
     const key = ym(y, m);
     if (trendCache[key]) return trendCache[key];
-
     const start = `${key}-01`;
-    const end   = new Date(y, m, 0).toISOString().slice(0, 10); // 해당 월의 마지막 날
+    const end   = new Date(y, m, 0).toISOString().slice(0, 10);
     const { data, error } = await db
-      .from('transactions')
-      .select('*')
-      .gte('date', start)
-      .lte('date', end)
+      .from('transactions').select('*')
+      .gte('date', start).lte('date', end)
       .order('date', { ascending: false });
-
     if (error) { console.error(error); return []; }
     trendCache[key] = data;
     return data;
   }
 
-  /* ── 렌더링 ── */
   async function render() {
     loading(true);
     document.getElementById('monthLabel').textContent = `${currentYear}년 ${currentMonth}월`;
@@ -565,9 +763,10 @@
 
     document.getElementById('totalIncome').textContent  = fmt(income);
     document.getElementById('totalExpense').textContent = fmt(expense);
+
     const balEl = document.getElementById('totalBalance');
     balEl.textContent = (balance < 0 ? '-' : '') + fmt(balance);
-    balEl.className   = 'amount' + (balance < 0 ? ' negative' : '');
+    balEl.classList.toggle('negative', balance < 0);
 
     await renderBarChart();
     renderDonutChart(txCache, expense);
@@ -577,7 +776,6 @@
 
   async function renderBarChart() {
     const labels = [], incomes = [], expenses = [];
-
     for (let i = 5; i >= 0; i--) {
       let m = currentMonth - i, y = currentYear;
       while (m < 1)  { m += 12; y--; }
@@ -596,25 +794,27 @@
       data: {
         labels,
         datasets: [
-          { label:'수입', data:incomes,  backgroundColor:'rgba(167,139,250,0.7)', borderRadius:6, borderSkipped:false },
-          { label:'지출', data:expenses, backgroundColor:'rgba(251,113,133,0.7)', borderRadius:6, borderSkipped:false },
+          { label:'수입', data:incomes,  backgroundColor:'rgba(74,222,128,0.65)', borderRadius:5, borderSkipped:false },
+          { label:'지출', data:expenses, backgroundColor:'rgba(248,113,113,0.65)', borderRadius:5, borderSkipped:false },
         ],
       },
       options: {
-        responsive: true, maintainAspectRatio: false,
-        interaction: { mode:'index', intersect:false },
-        plugins: {
-          legend: { position:'bottom', labels:{ boxWidth:10, boxHeight:10, borderRadius:3, padding:10, font:{size:10} } },
-          tooltip: {
-            backgroundColor:'#1a1828', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10,
-            callbacks: { label: ctx => ` ${ctx.dataset.label}: ${fmt(ctx.parsed.y)}` },
+        responsive:true, maintainAspectRatio:false,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{
+          legend:{ position:'bottom', labels:{ boxWidth:8, boxHeight:8, borderRadius:3, padding:12, font:{size:10,weight:'600'}, color:'#8c8aa6' } },
+          tooltip:{
+            backgroundColor:'rgba(15,14,26,0.95)',
+            borderColor:'rgba(255,255,255,0.08)', borderWidth:1,
+            padding:10, cornerRadius:10,
+            callbacks:{ label: c => ` ${c.dataset.label}: ${fmt(c.parsed.y)}` },
           },
         },
-        scales: {
-          x: { grid:{display:false}, ticks:{font:{size:10}}, border:{display:false} },
-          y: {
-            grid:{color:'rgba(255,255,255,0.04)'}, border:{display:false},
-            ticks:{ font:{size:9}, callback: v => v===0?'0':v>=1000000?(v/1000000).toFixed(0)+'M':(v/1000).toFixed(0)+'K' },
+        scales:{
+          x:{ grid:{display:false}, ticks:{font:{size:10,weight:'500'}, color:'#3e3c55'}, border:{display:false} },
+          y:{
+            grid:{color:'rgba(255,255,255,0.03)'}, border:{display:false},
+            ticks:{ font:{size:9}, color:'#3e3c55', callback: v => v===0?'0':v>=1000000?(v/1000000).toFixed(0)+'M':(v/1000).toFixed(0)+'K' },
           },
         },
       },
@@ -634,7 +834,7 @@
 
     if (cats.length === 0) {
       document.getElementById('donutChart').style.display = 'none';
-      document.getElementById('donutCenter').innerHTML = '<div style="font-size:0.82rem;color:var(--text-muted)">지출 없음</div>';
+      document.getElementById('donutCenter').innerHTML = '<div style="font-size:0.8rem;color:#3e3c55;font-weight:600">지출 없음</div>';
       return;
     }
 
@@ -648,15 +848,17 @@
       type: 'doughnut',
       data: {
         labels: cats,
-        datasets: [{ data:vals, backgroundColor:cats.map((_,i)=>CAT_COLORS[i%CAT_COLORS.length]), borderWidth:0, hoverOffset:6 }],
+        datasets: [{ data:vals, backgroundColor:cats.map((_,i)=>CAT_COLORS[i%CAT_COLORS.length]), borderWidth:0, hoverOffset:5 }],
       },
       options: {
-        responsive:true, maintainAspectRatio:false, cutout:'68%',
-        plugins: {
-          legend:{ position:'bottom', labels:{boxWidth:8,boxHeight:8,borderRadius:2,padding:8,font:{size:9}} },
+        responsive:true, maintainAspectRatio:false, cutout:'70%',
+        plugins:{
+          legend:{ position:'bottom', labels:{ boxWidth:7, boxHeight:7, borderRadius:2, padding:8, font:{size:9,weight:'600'}, color:'#8c8aa6' } },
           tooltip:{
-            backgroundColor:'#1a1828', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10,
-            callbacks:{ label: ctx => ` ${fmt(ctx.parsed)}` },
+            backgroundColor:'rgba(15,14,26,0.95)',
+            borderColor:'rgba(255,255,255,0.08)', borderWidth:1,
+            padding:10, cornerRadius:10,
+            callbacks:{ label: c => ` ${fmt(c.parsed)}` },
           },
         },
       },
@@ -670,7 +872,7 @@
 
     const list = document.getElementById('txList');
     if (filtered.length === 0) {
-      list.innerHTML = `<div class="empty"><div class="eicon">📭</div>내역이 없습니다.</div>`;
+      list.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">내역이 없습니다</div></div>`;
       return;
     }
 
@@ -679,7 +881,10 @@
         <div class="tx-icon ${t.type}">${ICONS[t.category] || '📌'}</div>
         <div class="tx-info">
           <div class="tx-desc">${esc(t.description)}</div>
-          <div class="tx-meta">${t.category} · ${t.date}</div>
+          <div class="tx-meta">
+            <span class="tx-cat">${t.category}</span>
+            <span class="tx-date">${t.date}</span>
+          </div>
         </div>
         <div class="tx-amount ${t.type}">${t.type === 'income' ? '+' : '−'}${fmt(t.amount)}</div>
         <button class="tx-delete" onclick="deleteTransaction(${t.id})" title="삭제">✕</button>
@@ -687,36 +892,26 @@
     `).join('');
   }
 
-  /* ── CRUD ── */
   async function addTransaction() {
     const desc   = document.getElementById('inputDesc').value.trim();
     const amount = parseInt(document.getElementById('inputAmount').value, 10);
     const cat    = document.getElementById('inputCategory').value;
     const date   = document.getElementById('inputDate').value;
 
-    if (!desc)              { toast('내용을 입력하세요.', true); return; }
+    if (!desc)               { toast('내용을 입력하세요.', true); return; }
     if (!amount || amount <= 0) { toast('올바른 금액을 입력하세요.', true); return; }
-    if (!date)              { toast('날짜를 선택하세요.', true); return; }
+    if (!date)               { toast('날짜를 선택하세요.', true); return; }
 
     const btn = document.getElementById('btnAdd');
     btn.disabled = true;
     loading(true);
 
-    const { error } = await db.from('transactions').insert({
-      type: currentType,
-      description: desc,
-      amount,
-      category: cat,
-      date,
-    });
-
+    const { error } = await db.from('transactions').insert({ type:currentType, description:desc, amount, category:cat, date });
     btn.disabled = false;
 
     if (error) { loading(false); toast('저장 실패: ' + error.message, true); return; }
 
-    // 캐시 무효화
     delete trendCache[ym(currentYear, currentMonth)];
-
     document.getElementById('inputDesc').value   = '';
     document.getElementById('inputAmount').value = '';
     toast('추가 완료 ✓');
@@ -727,7 +922,6 @@
     loading(true);
     const { error } = await db.from('transactions').delete().eq('id', id);
     if (error) { loading(false); toast('삭제 실패: ' + error.message, true); return; }
-
     delete trendCache[ym(currentYear, currentMonth)];
     toast('삭제됨');
     await render();
