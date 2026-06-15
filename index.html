@@ -11,37 +11,30 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:          #f2ece0;
-      --surface:     #faf7f2;
-      --surface2:    #f5efe4;
-      --border:      rgba(160,120,70,0.13);
-      --border-hi:   rgba(160,120,70,0.22);
-      --shadow:      0 2px 14px rgba(100,65,20,0.08);
-      --shadow-lg:   0 8px 32px rgba(100,65,20,0.13);
-      --shadow-hero: 0 16px 48px rgba(80,45,10,0.22);
+      --bg:       #f1f3f6;
+      --surface:  #ffffff;
+      --border:   #e4e7ec;
 
-      --text:        #2a1a08;
-      --text-2:      #7a5c38;
-      --text-3:      #bba07a;
+      --text:     #101828;
+      --text-2:   #667085;
+      --text-3:   #d0d5dd;
 
-      --income:      #2a8c62;
-      --income-bg:   #edf7f3;
-      --income-dk:   #1e6b4a;
+      --green:    #12b76a;
+      --green-bg: #ecfdf3;
+      --green-dk: #027a48;
 
-      --expense:     #c44d28;
-      --expense-bg:  #fdf1ec;
-      --expense-dk:  #a33a1a;
+      --red:      #f04438;
+      --red-bg:   #fef3f2;
+      --red-dk:   #b42318;
 
-      --accent:      #a0682a;
-      --accent-bg:   #fdf3e4;
-      --accent-lt:   #e8c48a;
+      --purple:   #7f56d9;
+      --purple-bg:#f9f5ff;
+      --purple-dk:#6941c6;
 
-      --wood-dark:   #5c3820;
-      --wood-mid:    #8b5c34;
-      --wood-light:  #c49460;
+      --hero-from:#0f172a;
+      --hero-to:  #1e293b;
 
-      --r:    18px;
-      --r-sm: 12px;
+      --r: 16px;
     }
 
     body {
@@ -52,24 +45,11 @@
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ── 배경 텍스처 느낌 ── */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background-image:
-        radial-gradient(ellipse at 20% 10%, rgba(200,160,90,0.12) 0%, transparent 55%),
-        radial-gradient(ellipse at 80% 90%, rgba(180,120,60,0.1) 0%, transparent 55%);
-      pointer-events: none;
-      z-index: 0;
-    }
-
     /* ── Loading ── */
     .loading-bar {
       position: fixed; top: 0; left: 0;
-      height: 3px; width: 0;
-      background: linear-gradient(90deg, var(--wood-dark), var(--wood-light), var(--accent-lt));
-      border-radius: 0 99px 99px 0;
+      height: 2px; width: 0;
+      background: linear-gradient(90deg, var(--purple), var(--green));
       transition: width 0.3s;
       z-index: 200;
     }
@@ -80,210 +60,181 @@
     .toast {
       position: fixed; bottom: 28px; left: 50%;
       transform: translateX(-50%) translateY(14px);
-      background: var(--wood-dark);
-      color: #f5efe4;
+      background: var(--text);
+      color: #fff;
       padding: 10px 22px;
       border-radius: 99px;
       font-size: 0.82rem;
       font-weight: 600;
-      letter-spacing: -0.2px;
       opacity: 0;
       transition: all 0.25s cubic-bezier(.34,1.56,.64,1);
       pointer-events: none;
       white-space: nowrap;
       z-index: 199;
-      box-shadow: 0 4px 20px rgba(80,40,10,0.25);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
     }
     .toast.show  { opacity: 1; transform: translateX(-50%) translateY(0); }
-    .toast.error { background: var(--expense); }
+    .toast.error { background: var(--red); }
 
     /* ── Header ── */
     header {
-      position: sticky; top: 0; z-index: 50;
-      background: rgba(242,236,224,0.88);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid var(--border);
-      padding: 0 20px;
-      height: 56px;
+      background: var(--hero-from);
+      padding: 16px 20px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: sticky;
     }
 
     .logo {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      color: #fff;
       display: flex;
       align-items: center;
-      gap: 9px;
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: -0.6px;
-      color: var(--wood-dark);
+      gap: 8px;
     }
 
-    .logo-icon {
-      width: 30px; height: 30px;
-      background: linear-gradient(135deg, var(--wood-dark), var(--wood-light));
-      border-radius: 9px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.95rem;
-      box-shadow: 0 2px 8px rgba(92,56,32,0.3);
+    .logo-pill {
+      background: var(--purple);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 99px;
+      letter-spacing: 0.2px;
     }
 
     .month-nav {
       display: flex;
       align-items: center;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 99px;
-      padding: 3px;
-      box-shadow: var(--shadow);
+      gap: 8px;
+    }
+
+    .month-nav span {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: rgba(255,255,255,0.7);
+      min-width: 80px;
+      text-align: center;
     }
 
     .nav-btn {
-      width: 28px; height: 28px;
-      border: none; background: transparent;
-      color: var(--text-3);
-      border-radius: 50%;
+      width: 30px; height: 30px;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.08);
+      color: rgba(255,255,255,0.7);
+      border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
       display: flex; align-items: center; justify-content: center;
       transition: all 0.15s;
     }
-    .nav-btn:hover { background: var(--accent-bg); color: var(--accent); }
+    .nav-btn:hover { background: rgba(255,255,255,0.16); color: #fff; }
 
-    .month-nav span {
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-      color: var(--text);
-      padding: 0 10px;
-      min-width: 82px;
-      text-align: center;
+    /* ── Hero section (dark banner) ── */
+    .hero-band {
+      background: linear-gradient(180deg, var(--hero-from) 0%, var(--hero-to) 100%);
+      padding: 24px 20px 52px;
     }
 
-    /* ── Layout ── */
+    .hero-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      margin-bottom: 6px;
+    }
+
+    .hero-balance {
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: -2.5px;
+      color: #fff;
+      line-height: 1;
+    }
+
+    .hero-balance.neg { color: #fda29b; }
+
+    /* ── Float cards ── */
     .container {
-      position: relative; z-index: 1;
       max-width: 680px;
-      margin: 0 auto;
-      padding: 20px 16px 64px;
+      margin: -36px auto 0;
+      padding: 0 16px 64px;
       display: flex;
       flex-direction: column;
       gap: 14px;
     }
 
-    /* ── Hero Card ── */
-    .hero {
-      background: linear-gradient(145deg, #4a2810 0%, #7a4825 45%, #b07840 80%, #c89850 100%);
-      border-radius: 26px;
-      padding: 30px 28px 26px;
-      color: #fdf5e8;
-      position: relative;
-      overflow: hidden;
-      box-shadow: var(--shadow-hero);
-    }
-
-    /* 우드 결 느낌 레이어 */
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: repeating-linear-gradient(
-        100deg,
-        transparent,
-        transparent 40px,
-        rgba(255,255,255,0.015) 40px,
-        rgba(255,255,255,0.015) 41px
-      );
-      pointer-events: none;
-    }
-
-    .hero::after {
-      content: '';
-      position: absolute;
-      width: 280px; height: 280px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.05);
-      top: -90px; right: -80px;
-      pointer-events: none;
-    }
-
-    .hero-month {
-      font-size: 0.73rem;
-      font-weight: 600;
-      letter-spacing: 0.4px;
-      color: rgba(253,245,232,0.55);
-      margin-bottom: 8px;
-    }
-
-    .hero-balance {
-      font-size: 2.9rem;
-      font-weight: 900;
-      letter-spacing: -2.5px;
-      line-height: 1;
-      margin-bottom: 4px;
-      position: relative;
-    }
-
-    .hero-sub {
-      font-size: 0.75rem;
-      color: rgba(253,245,232,0.45);
-      margin-bottom: 24px;
-    }
-
-    .hero-row {
+    /* ── Summary strip ── */
+    .summary-strip {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      position: relative;
+      gap: 12px;
     }
 
-    .hero-stat {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 14px;
-      padding: 12px 14px;
-      backdrop-filter: blur(6px);
+    .sum-card {
+      background: var(--surface);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      padding: 18px 18px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.06);
     }
 
-    .hero-stat-label {
-      font-size: 0.68rem;
-      font-weight: 600;
-      color: rgba(253,245,232,0.55);
-      margin-bottom: 4px;
+    .sum-card-top {
       display: flex;
       align-items: center;
-      gap: 5px;
+      justify-content: space-between;
+      margin-bottom: 10px;
     }
 
-    .stat-dot { width: 5px; height: 5px; border-radius: 50%; }
-    .stat-dot.income  { background: #7dffc0; }
-    .stat-dot.expense { background: #ffb39a; }
+    .sum-type {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: var(--text-2);
+    }
 
-    .hero-stat-val {
-      font-size: 1.05rem;
+    .sum-badge {
+      font-size: 0.68rem;
       font-weight: 800;
-      letter-spacing: -0.6px;
-      color: #fdf5e8;
+      padding: 2px 8px;
+      border-radius: 99px;
     }
 
-    /* ── White Cards ── */
+    .sum-card.income .sum-badge { background: var(--green-bg); color: var(--green-dk); }
+    .sum-card.expense .sum-badge { background: var(--red-bg); color: var(--red-dk); }
+
+    .sum-val {
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: -0.8px;
+    }
+
+    .sum-card.income .sum-val  { color: var(--green-dk); }
+    .sum-card.expense .sum-val { color: var(--red-dk); }
+
+    /* ── Card base ── */
     .card {
       background: var(--surface);
       border-radius: var(--r);
       border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+      padding: 16px 20px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .card-title {
-      font-size: 0.7rem;
+      font-size: 0.78rem;
       font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: var(--text-3);
-      margin-bottom: 14px;
+      letter-spacing: 0.3px;
+      color: var(--text-2);
     }
 
     /* ── Charts ── */
@@ -292,6 +243,8 @@
       grid-template-columns: 1fr 1fr;
       gap: 14px;
     }
+
+    .chart-body { padding: 14px 16px 16px; }
 
     .chart-wrap {
       position: relative;
@@ -304,43 +257,44 @@
       text-align: center;
       pointer-events: none;
     }
-    .dc-val   { font-size: 0.9rem; font-weight: 800; color: var(--text); letter-spacing: -0.4px; }
+    .dc-val   { font-size: 0.88rem; font-weight: 800; color: var(--text); }
     .dc-label { font-size: 0.6rem; font-weight: 600; color: var(--text-3); margin-top: 2px; }
 
     /* ── Form ── */
+    .form-body { padding: 16px 18px 18px; }
+
     .type-toggle {
       display: flex;
       gap: 6px;
-      background: var(--surface2);
-      border-radius: 12px;
-      padding: 4px;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 3px;
       margin-bottom: 14px;
     }
 
     .type-toggle button {
       flex: 1;
-      padding: 10px;
+      padding: 9px;
       border: none;
-      border-radius: 9px;
+      border-radius: 8px;
       background: transparent;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 700;
       font-family: inherit;
       cursor: pointer;
       color: var(--text-3);
-      letter-spacing: -0.2px;
-      transition: all 0.2s cubic-bezier(.34,1.4,.64,1);
+      transition: all 0.18s;
     }
 
     .type-toggle button.active-income {
-      background: var(--income-bg);
-      color: var(--income-dk);
-      box-shadow: 0 1px 6px rgba(42,140,98,0.15);
+      background: var(--green-bg);
+      color: var(--green-dk);
+      box-shadow: 0 1px 4px rgba(18,183,106,0.2);
     }
     .type-toggle button.active-expense {
-      background: var(--expense-bg);
-      color: var(--expense-dk);
-      box-shadow: 0 1px 6px rgba(196,77,40,0.15);
+      background: var(--red-bg);
+      color: var(--red-dk);
+      box-shadow: 0 1px 4px rgba(240,68,56,0.2);
     }
 
     .form-grid {
@@ -352,26 +306,25 @@
 
     .field input, .field select {
       width: 100%;
-      padding: 11px 14px;
+      padding: 10px 12px;
       border: 1.5px solid var(--border);
-      border-radius: var(--r-sm);
-      font-size: 0.875rem;
+      border-radius: 10px;
+      font-size: 0.86rem;
       font-family: inherit;
       font-weight: 500;
-      background: var(--surface2);
+      background: var(--bg);
       color: var(--text);
       outline: none;
-      transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
-      letter-spacing: -0.2px;
+      transition: all 0.15s;
     }
 
     .field input::placeholder { color: var(--text-3); }
     .field select option       { background: var(--surface); }
 
     .field input:focus, .field select:focus {
-      border-color: var(--accent);
+      border-color: var(--purple);
       background: var(--surface);
-      box-shadow: 0 0 0 3px var(--accent-bg);
+      box-shadow: 0 0 0 3px var(--purple-bg);
     }
 
     .field input[type="number"] { -moz-appearance: textfield; }
@@ -381,43 +334,42 @@
     .btn-add {
       width: 100%;
       margin-top: 8px;
-      padding: 13px;
+      padding: 12px;
       border: none;
-      border-radius: var(--r-sm);
-      font-size: 0.92rem;
+      border-radius: 10px;
+      font-size: 0.9rem;
       font-weight: 800;
       font-family: inherit;
-      letter-spacing: -0.3px;
       cursor: pointer;
-      background: linear-gradient(135deg, var(--wood-dark) 0%, var(--wood-mid) 100%);
-      color: #fdf5e8;
-      box-shadow: 0 4px 16px rgba(92,56,32,0.28);
+      background: var(--purple);
+      color: #fff;
+      box-shadow: 0 1px 3px rgba(127,86,217,0.3), 0 4px 14px rgba(127,86,217,0.25);
       transition: all 0.15s;
     }
-    .btn-add:hover  { opacity: 0.92; box-shadow: 0 6px 22px rgba(92,56,32,0.36); }
+    .btn-add:hover  { background: var(--purple-dk); }
     .btn-add:active { transform: scale(0.98); }
-    .btn-add:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-add:disabled { opacity: 0.5; cursor: not-allowed; }
 
     /* ── List ── */
-    .list-header {
+    .list-meta {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      padding: 0 2px;
     }
 
     .list-title {
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      color: var(--text-3);
+      color: var(--text-2);
+      letter-spacing: 0.3px;
     }
 
     .filter-select {
-      padding: 5px 12px;
+      padding: 5px 10px;
       border: 1.5px solid var(--border);
-      border-radius: 99px;
-      font-size: 0.75rem;
+      border-radius: 8px;
+      font-size: 0.74rem;
       font-family: inherit;
       font-weight: 700;
       background: var(--surface);
@@ -425,105 +377,103 @@
       outline: none;
       cursor: pointer;
     }
-    .filter-select:focus { border-color: var(--accent); }
+    .filter-select:focus { border-color: var(--purple); }
 
-    .tx-list { display: flex; flex-direction: column; gap: 6px; }
+    /* 날짜 구분선 */
+    .date-group { margin-bottom: 4px; }
+
+    .date-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: var(--text-3);
+      padding: 10px 4px 4px;
+      letter-spacing: 0.2px;
+    }
+
+    .tx-list {
+      background: var(--surface);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.05);
+      overflow: hidden;
+    }
+
+    .tx-list-empty {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-3);
+    }
+    .tx-list-empty .eicon { font-size: 2rem; margin-bottom: 8px; opacity: 0.4; }
+    .tx-list-empty .etxt  { font-size: 0.84rem; font-weight: 600; }
 
     .tx-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 13px 16px;
       display: flex;
       align-items: center;
       gap: 12px;
-      box-shadow: var(--shadow);
-      animation: slideUp 0.22s cubic-bezier(.34,1.4,.64,1) both;
-      transition: box-shadow 0.15s, transform 0.15s, border-color 0.15s;
+      padding: 13px 18px;
+      border-bottom: 1px solid var(--border);
+      animation: fadeIn 0.2s ease both;
+      transition: background 0.1s;
+      cursor: default;
     }
 
-    .tx-item:hover {
-      box-shadow: var(--shadow-lg);
-      transform: translateY(-1px);
-      border-color: var(--border-hi);
-    }
+    .tx-item:last-child { border-bottom: none; }
+    .tx-item:hover { background: #fafafa; }
 
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(10px); }
-      to   { opacity: 1; transform: none; }
-    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .tx-icon {
-      width: 42px; height: 42px;
-      border-radius: 13px;
+      width: 38px; height: 38px;
+      border-radius: 10px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.1rem;
+      font-size: 1rem;
       flex-shrink: 0;
     }
-    .tx-icon.income  { background: var(--income-bg); }
-    .tx-icon.expense { background: var(--expense-bg); }
+    .tx-icon.income  { background: var(--green-bg); }
+    .tx-icon.expense { background: var(--red-bg); }
 
     .tx-info { flex: 1; min-width: 0; }
 
     .tx-desc {
       font-size: 0.875rem;
-      font-weight: 700;
-      letter-spacing: -0.3px;
+      font-weight: 600;
       color: var(--text);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .tx-meta {
-      margin-top: 3px;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-
     .tx-cat {
-      font-size: 0.67rem;
+      display: inline-block;
+      font-size: 0.66rem;
       font-weight: 700;
       color: var(--text-3);
-      background: var(--surface2);
-      border-radius: 99px;
-      padding: 1px 7px;
+      margin-top: 2px;
     }
-
-    .tx-date { font-size: 0.67rem; font-weight: 500; color: var(--text-3); }
 
     .tx-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
     .tx-amount {
       font-size: 0.9rem;
       font-weight: 800;
-      letter-spacing: -0.4px;
+      letter-spacing: -0.3px;
     }
-    .tx-amount.income  { color: var(--income-dk); }
-    .tx-amount.expense { color: var(--expense); }
+    .tx-amount.income  { color: var(--green-dk); }
+    .tx-amount.expense { color: var(--red-dk); }
 
     .tx-delete {
       background: none; border: none;
       color: var(--text-3);
       cursor: pointer;
-      width: 26px; height: 26px;
-      border-radius: 8px;
+      width: 24px; height: 24px;
+      border-radius: 6px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.72rem;
-      transition: all 0.15s;
+      font-size: 0.7rem;
+      transition: all 0.12s;
       opacity: 0;
     }
     .tx-item:hover .tx-delete { opacity: 1; }
-    .tx-delete:hover { background: var(--expense-bg); color: var(--expense); }
-
-    .empty {
-      text-align: center;
-      padding: 52px 20px;
-      color: var(--text-3);
-    }
-    .empty-icon { font-size: 2.2rem; margin-bottom: 10px; opacity: 0.4; }
-    .empty-text { font-size: 0.85rem; font-weight: 600; }
+    .tx-delete:hover { background: var(--red-bg); color: var(--red); }
 
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -535,10 +485,11 @@
 <div class="loading-bar" id="loadingBar"></div>
 <div class="toast" id="toast"></div>
 
+<!-- Header -->
 <header>
   <div class="logo">
-    <div class="logo-icon">🌿</div>
     가계부
+    <span class="logo-pill">BETA</span>
   </div>
   <div class="month-nav">
     <button class="nav-btn" id="prevMonth">&#8249;</button>
@@ -547,70 +498,83 @@
   </div>
 </header>
 
+<!-- Dark hero band -->
+<div class="hero-band">
+  <div class="hero-label" id="heroLabel">이번 달 잔액</div>
+  <div class="hero-balance" id="totalBalance">₩0</div>
+</div>
+
 <div class="container">
 
-  <!-- Hero -->
-  <div class="hero">
-    <div class="hero-month" id="heroMonth"></div>
-    <div class="hero-balance" id="totalBalance">₩0</div>
-    <div class="hero-sub">수입 − 지출</div>
-    <div class="hero-row">
-      <div class="hero-stat">
-        <div class="hero-stat-label"><span class="stat-dot income"></span> 수입</div>
-        <div class="hero-stat-val" id="totalIncome">₩0</div>
+  <!-- Summary cards (float over hero) -->
+  <div class="summary-strip">
+    <div class="sum-card income">
+      <div class="sum-card-top">
+        <div class="sum-type">수입</div>
+        <div class="sum-badge income">↑ 입금</div>
       </div>
-      <div class="hero-stat">
-        <div class="hero-stat-label"><span class="stat-dot expense"></span> 지출</div>
-        <div class="hero-stat-val" id="totalExpense">₩0</div>
+      <div class="sum-val" id="totalIncome">₩0</div>
+    </div>
+    <div class="sum-card expense">
+      <div class="sum-card-top">
+        <div class="sum-type">지출</div>
+        <div class="sum-badge expense">↓ 출금</div>
       </div>
+      <div class="sum-val" id="totalExpense">₩0</div>
     </div>
   </div>
 
   <!-- Charts -->
   <div class="charts">
     <div class="card">
-      <div class="card-title">6개월 트렌드</div>
-      <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+      <div class="card-header"><span class="card-title">6개월 트렌드</span></div>
+      <div class="chart-body">
+        <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+      </div>
     </div>
     <div class="card">
-      <div class="card-title">지출 카테고리</div>
-      <div class="chart-wrap">
-        <div class="donut-center" id="donutCenter">
-          <div class="dc-val" id="donutVal">₩0</div>
-          <div class="dc-label">이번 달 지출</div>
+      <div class="card-header"><span class="card-title">카테고리별 지출</span></div>
+      <div class="chart-body">
+        <div class="chart-wrap">
+          <div class="donut-center" id="donutCenter">
+            <div class="dc-val" id="donutVal">₩0</div>
+            <div class="dc-label">이번 달 지출</div>
+          </div>
+          <canvas id="donutChart"></canvas>
         </div>
-        <canvas id="donutChart"></canvas>
       </div>
     </div>
   </div>
 
   <!-- Form -->
   <div class="card">
-    <div class="type-toggle">
-      <button id="btnIncome" class="active-income" onclick="setType('income')">↑ 수입</button>
-      <button id="btnExpense" onclick="setType('expense')">↓ 지출</button>
+    <div class="form-body">
+      <div class="type-toggle">
+        <button id="btnIncome" class="active-income" onclick="setType('income')">↑ 수입</button>
+        <button id="btnExpense" onclick="setType('expense')">↓ 지출</button>
+      </div>
+      <div class="form-grid">
+        <div class="field"><input type="text" id="inputDesc" placeholder="내용" maxlength="40" /></div>
+        <div class="field"><select id="inputCategory"></select></div>
+      </div>
+      <div class="form-grid">
+        <div class="field"><input type="number" id="inputAmount" placeholder="금액 (원)" min="1" /></div>
+        <div class="field"><input type="date" id="inputDate" /></div>
+      </div>
+      <button class="btn-add" id="btnAdd" onclick="addTransaction()">추가하기</button>
     </div>
-    <div class="form-grid">
-      <div class="field"><input type="text" id="inputDesc" placeholder="내용 (예: 점심식사)" maxlength="40" /></div>
-      <div class="field"><select id="inputCategory"></select></div>
-    </div>
-    <div class="form-grid">
-      <div class="field"><input type="number" id="inputAmount" placeholder="금액 (원)" min="1" /></div>
-      <div class="field"><input type="date" id="inputDate" /></div>
-    </div>
-    <button class="btn-add" id="btnAdd" onclick="addTransaction()">추가하기</button>
   </div>
 
   <!-- List -->
-  <div class="list-header">
+  <div class="list-meta">
     <div class="list-title" id="listTitle">이번 달 내역</div>
     <select class="filter-select" id="filterType" onchange="renderList()">
       <option value="all">전체</option>
-      <option value="income">수입</option>
-      <option value="expense">지출</option>
+      <option value="income">수입만</option>
+      <option value="expense">지출만</option>
     </select>
   </div>
-  <div class="tx-list" id="txList"></div>
+  <div id="txList"></div>
 
 </div>
 
@@ -630,10 +594,8 @@
     '통신':'📱','주거':'🏠','교육':'📚','기타지출':'📌',
   };
 
-  const CAT_COLORS = [
-    '#8b5c34','#c44d28','#2a8c62','#c4941a','#5b8ac4',
-    '#b85c8a','#4aaa70','#c47a28','#4a9cc4','#9c5cb8',
-  ];
+  const CAT_COLORS = ['#7f56d9','#f04438','#12b76a','#f79009','#2e90fa',
+    '#ee46bc','#17b26a','#fb6514','#0ba5ec','#875bf7'];
 
   let currentType = 'income';
   let currentYear, currentMonth;
@@ -642,7 +604,7 @@
   let barChartInst = null;
   let donutChartInst = null;
 
-  Chart.defaults.color = '#bba07a';
+  Chart.defaults.color = '#98a2b3';
   Chart.defaults.font.family = "'Pretendard Variable', 'Pretendard', -apple-system, sans-serif";
 
   function fmt(n) { return '₩' + Math.abs(n).toLocaleString('ko-KR'); }
@@ -660,7 +622,7 @@
     el.textContent = msg;
     el.className = 'toast' + (isError ? ' error' : '');
     el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 2500);
+    setTimeout(() => el.classList.remove('show'), 2400);
   }
 
   async function init() {
@@ -685,40 +647,38 @@
     currentType = type;
     document.getElementById('btnIncome').className  = type === 'income'  ? 'active-income'  : '';
     document.getElementById('btnExpense').className = type === 'expense' ? 'active-expense' : '';
-    const sel = document.getElementById('inputCategory');
-    sel.innerHTML = CATEGORIES[type].map(c => `<option>${c}</option>`).join('');
+    document.getElementById('inputCategory').innerHTML =
+      CATEGORIES[type].map(c => `<option>${c}</option>`).join('');
   }
 
   async function fetchMonth(y, m) {
     const key = ym(y, m);
     if (trendCache[key]) return trendCache[key];
-    const start = `${key}-01`;
-    const end   = new Date(y, m, 0).toISOString().slice(0, 10);
-    const { data, error } = await db
-      .from('transactions').select('*')
-      .gte('date', start).lte('date', end)
+    const { data, error } = await db.from('transactions').select('*')
+      .gte('date', `${key}-01`)
+      .lte('date', new Date(y, m, 0).toISOString().slice(0, 10))
       .order('date', { ascending: false });
     if (error) { console.error(error); return []; }
-    trendCache[key] = data;
-    return data;
+    return (trendCache[key] = data);
   }
 
   async function render() {
     loading(true);
     const label = `${currentYear}년 ${currentMonth}월`;
     document.getElementById('monthLabel').textContent = label;
-    document.getElementById('heroMonth').textContent  = label;
+    document.getElementById('heroLabel').textContent  = `${currentMonth}월 잔액`;
     document.getElementById('listTitle').textContent  = `${currentMonth}월 내역`;
 
     txCache = await fetchMonth(currentYear, currentMonth);
-
-    const income  = txCache.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0);
-    const expense = txCache.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
+    const income  = txCache.filter(t => t.type==='income').reduce((s,t)=>s+t.amount,0);
+    const expense = txCache.filter(t => t.type==='expense').reduce((s,t)=>s+t.amount,0);
     const balance = income - expense;
 
     document.getElementById('totalIncome').textContent  = fmt(income);
     document.getElementById('totalExpense').textContent = fmt(expense);
-    document.getElementById('totalBalance').textContent = (balance < 0 ? '−' : '') + fmt(balance);
+    const balEl = document.getElementById('totalBalance');
+    balEl.textContent = (balance < 0 ? '−' : '') + fmt(balance);
+    balEl.className   = 'hero-balance' + (balance < 0 ? ' neg' : '');
 
     await renderBarChart();
     renderDonutChart(txCache, expense);
@@ -727,46 +687,39 @@
   }
 
   async function renderBarChart() {
-    const labels = [], incomes = [], expenses = [];
-    for (let i = 5; i >= 0; i--) {
-      let m = currentMonth - i, y = currentYear;
-      while (m < 1)  { m += 12; y--; }
-      while (m > 12) { m -= 12; y++; }
+    const labels=[], incomes=[], expenses=[];
+    for (let i=5; i>=0; i--) {
+      let m=currentMonth-i, y=currentYear;
+      while(m<1){m+=12;y--;} while(m>12){m-=12;y++;}
       labels.push(`${m}월`);
-      const txs = await fetchMonth(y, m);
-      incomes.push(txs.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0));
-      expenses.push(txs.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0));
+      const txs = await fetchMonth(y,m);
+      incomes.push(txs.filter(t=>t.type==='income').reduce((s,t)=>s+t.amount,0));
+      expenses.push(txs.filter(t=>t.type==='expense').reduce((s,t)=>s+t.amount,0));
     }
-
     const ctx = document.getElementById('barChart').getContext('2d');
     if (barChartInst) barChartInst.destroy();
-
     barChartInst = new Chart(ctx, {
-      type: 'bar',
-      data: {
+      type:'bar',
+      data:{
         labels,
-        datasets: [
-          { label:'수입', data:incomes,  backgroundColor:'rgba(42,140,98,0.75)',  borderRadius:5, borderSkipped:false },
-          { label:'지출', data:expenses, backgroundColor:'rgba(196,77,40,0.75)', borderRadius:5, borderSkipped:false },
+        datasets:[
+          {label:'수입',data:incomes, backgroundColor:'rgba(18,183,106,0.75)',borderRadius:5,borderSkipped:false},
+          {label:'지출',data:expenses,backgroundColor:'rgba(240,68,56,0.75)', borderRadius:5,borderSkipped:false},
         ],
       },
-      options: {
-        responsive:true, maintainAspectRatio:false,
-        interaction:{ mode:'index', intersect:false },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        interaction:{mode:'index',intersect:false},
         plugins:{
-          legend:{ position:'bottom', labels:{ boxWidth:8, boxHeight:8, borderRadius:3, padding:12, font:{size:10,weight:'700'}, color:'#bba07a' } },
-          tooltip:{
-            backgroundColor:'#2a1a08', borderColor:'rgba(160,120,70,0.2)', borderWidth:1,
-            padding:10, cornerRadius:10,
-            callbacks:{ label: c => ` ${c.dataset.label}: ${fmt(c.parsed.y)}` },
-          },
+          legend:{position:'bottom',labels:{boxWidth:8,boxHeight:8,borderRadius:3,padding:12,font:{size:10,weight:'700'},color:'#98a2b3'}},
+          tooltip:{backgroundColor:'#101828',borderColor:'#344054',borderWidth:1,padding:10,cornerRadius:8,
+            callbacks:{label:c=>` ${c.dataset.label}: ${fmt(c.parsed.y)}`}},
         },
         scales:{
-          x:{ grid:{display:false}, ticks:{font:{size:10,weight:'600'}, color:'#bba07a'}, border:{display:false} },
-          y:{
-            grid:{color:'rgba(160,120,70,0.07)'}, border:{display:false},
-            ticks:{ font:{size:9,weight:'600'}, color:'#bba07a', callback: v => v===0?'0':v>=1000000?(v/1000000).toFixed(0)+'M':(v/1000).toFixed(0)+'K' },
-          },
+          x:{grid:{display:false},ticks:{font:{size:10,weight:'600'},color:'#98a2b3'},border:{display:false}},
+          y:{grid:{color:'rgba(0,0,0,0.04)'},border:{display:false},
+            ticks:{font:{size:9,weight:'600'},color:'#98a2b3',
+              callback:v=>v===0?'0':v>=1000000?(v/1000000).toFixed(0)+'M':(v/1000).toFixed(0)+'K'}},
         },
       },
     });
@@ -775,68 +728,72 @@
   function renderDonutChart(txs, totalExpense) {
     const ctx = document.getElementById('donutChart').getContext('2d');
     if (donutChartInst) donutChartInst.destroy();
+    const catMap={};
+    txs.filter(t=>t.type==='expense').forEach(t=>catMap[t.category]=(catMap[t.category]||0)+t.amount);
+    const cats=Object.keys(catMap), vals=cats.map(c=>catMap[c]);
 
-    const catMap = {};
-    txs.filter(t => t.type === 'expense').forEach(t => catMap[t.category] = (catMap[t.category]||0) + t.amount);
-    const cats = Object.keys(catMap);
-    const vals = cats.map(c => catMap[c]);
-
-    if (cats.length === 0) {
-      document.getElementById('donutChart').style.display = 'none';
-      document.getElementById('donutCenter').innerHTML = '<div style="font-size:0.8rem;color:var(--text-3);font-weight:700">지출 없음</div>';
+    if (!cats.length) {
+      document.getElementById('donutChart').style.display='none';
+      document.getElementById('donutCenter').innerHTML='<div style="font-size:0.8rem;color:var(--text-3);font-weight:700">지출 없음</div>';
       return;
     }
+    document.getElementById('donutChart').style.display='';
+    document.getElementById('donutCenter').innerHTML=`<div class="dc-val">${fmt(totalExpense)}</div><div class="dc-label">이번 달 지출</div>`;
 
-    document.getElementById('donutChart').style.display = '';
-    document.getElementById('donutCenter').innerHTML = `
-      <div class="dc-val">${fmt(totalExpense)}</div>
-      <div class="dc-label">이번 달 지출</div>
-    `;
-
-    donutChartInst = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: cats,
-        datasets: [{ data:vals, backgroundColor:cats.map((_,i)=>CAT_COLORS[i%CAT_COLORS.length]), borderWidth:3, borderColor:['#faf7f2'], hoverOffset:5 }],
-      },
-      options: {
-        responsive:true, maintainAspectRatio:false, cutout:'70%',
+    donutChartInst = new Chart(ctx,{
+      type:'doughnut',
+      data:{labels:cats,datasets:[{data:vals,backgroundColor:cats.map((_,i)=>CAT_COLORS[i%CAT_COLORS.length]),borderWidth:2,borderColor:'#fff',hoverOffset:4}]},
+      options:{responsive:true,maintainAspectRatio:false,cutout:'70%',
         plugins:{
-          legend:{ position:'bottom', labels:{ boxWidth:7, boxHeight:7, borderRadius:2, padding:8, font:{size:9,weight:'700'}, color:'#bba07a' } },
-          tooltip:{
-            backgroundColor:'#2a1a08', borderColor:'rgba(160,120,70,0.2)', borderWidth:1,
-            padding:10, cornerRadius:10,
-            callbacks:{ label: c => ` ${fmt(c.parsed)}` },
-          },
-        },
-      },
+          legend:{position:'bottom',labels:{boxWidth:7,boxHeight:7,borderRadius:2,padding:8,font:{size:9,weight:'700'},color:'#98a2b3'}},
+          tooltip:{backgroundColor:'#101828',borderColor:'#344054',borderWidth:1,padding:10,cornerRadius:8,
+            callbacks:{label:c=>` ${fmt(c.parsed)}`}},
+        }},
     });
   }
 
   function renderList() {
     const filter = document.getElementById('filterType').value;
-    let filtered = filter === 'all' ? txCache : txCache.filter(t => t.type === filter);
-    filtered = [...filtered].sort((a,b) => b.date.localeCompare(a.date));
+    let list = filter==='all' ? txCache : txCache.filter(t=>t.type===filter);
+    list = [...list].sort((a,b)=>b.date.localeCompare(a.date));
 
-    const list = document.getElementById('txList');
-    if (filtered.length === 0) {
-      list.innerHTML = `<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">내역이 없습니다</div></div>`;
+    const el = document.getElementById('txList');
+    if (!list.length) {
+      el.innerHTML = `<div class="tx-list"><div class="tx-list-empty"><div class="eicon">📭</div><div class="etxt">내역이 없습니다</div></div></div>`;
       return;
     }
 
-    list.innerHTML = filtered.map((t, i) => `
-      <div class="tx-item" style="animation-delay:${i * 0.03}s">
-        <div class="tx-icon ${t.type}">${ICONS[t.category] || '📌'}</div>
-        <div class="tx-info">
-          <div class="tx-desc">${esc(t.description)}</div>
-          <div class="tx-meta">
-            <span class="tx-cat">${t.category}</span>
-            <span class="tx-date">${t.date}</span>
-          </div>
-        </div>
-        <div class="tx-right">
-          <div class="tx-amount ${t.type}">${t.type === 'income' ? '+' : '−'}${fmt(t.amount)}</div>
-          <button class="tx-delete" onclick="deleteTransaction(${t.id})" title="삭제">✕</button>
+    // 날짜 그룹핑
+    const groups = {};
+    list.forEach(t => { (groups[t.date] = groups[t.date]||[]).push(t); });
+
+    const today = new Date().toISOString().slice(0,10);
+    const yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+
+    function dateLabel(d) {
+      if (d===today) return '오늘';
+      if (d===yesterday) return '어제';
+      const [,m,day] = d.split('-');
+      return `${parseInt(m)}월 ${parseInt(day)}일`;
+    }
+
+    el.innerHTML = Object.entries(groups).sort(([a],[b])=>b.localeCompare(a)).map(([date, items]) => `
+      <div class="date-group">
+        <div class="date-label">${dateLabel(date)}</div>
+        <div class="tx-list">
+          ${items.map((t,i)=>`
+            <div class="tx-item" style="animation-delay:${i*0.03}s">
+              <div class="tx-icon ${t.type}">${ICONS[t.category]||'📌'}</div>
+              <div class="tx-info">
+                <div class="tx-desc">${esc(t.description)}</div>
+                <div class="tx-cat">${t.category}</div>
+              </div>
+              <div class="tx-right">
+                <div class="tx-amount ${t.type}">${t.type==='income'?'+':'−'}${fmt(t.amount)}</div>
+                <button class="tx-delete" onclick="deleteTransaction(${t.id})">✕</button>
+              </div>
+            </div>
+          `).join('')}
         </div>
       </div>
     `).join('');
@@ -844,34 +801,30 @@
 
   async function addTransaction() {
     const desc   = document.getElementById('inputDesc').value.trim();
-    const amount = parseInt(document.getElementById('inputAmount').value, 10);
+    const amount = parseInt(document.getElementById('inputAmount').value,10);
     const cat    = document.getElementById('inputCategory').value;
     const date   = document.getElementById('inputDate').value;
+    if (!desc)            { toast('내용을 입력하세요.',true); return; }
+    if (!amount||amount<=0){ toast('올바른 금액을 입력하세요.',true); return; }
+    if (!date)            { toast('날짜를 선택하세요.',true); return; }
 
-    if (!desc)               { toast('내용을 입력하세요.', true); return; }
-    if (!amount || amount <= 0) { toast('올바른 금액을 입력하세요.', true); return; }
-    if (!date)               { toast('날짜를 선택하세요.', true); return; }
-
-    const btn = document.getElementById('btnAdd');
-    btn.disabled = true; loading(true);
-
-    const { error } = await db.from('transactions').insert({ type:currentType, description:desc, amount, category:cat, date });
-    btn.disabled = false;
-
-    if (error) { loading(false); toast('저장 실패: ' + error.message, true); return; }
-
-    delete trendCache[ym(currentYear, currentMonth)];
-    document.getElementById('inputDesc').value   = '';
-    document.getElementById('inputAmount').value = '';
+    const btn=document.getElementById('btnAdd');
+    btn.disabled=true; loading(true);
+    const {error}=await db.from('transactions').insert({type:currentType,description:desc,amount,category:cat,date});
+    btn.disabled=false;
+    if(error){loading(false);toast('저장 실패: '+error.message,true);return;}
+    delete trendCache[ym(currentYear,currentMonth)];
+    document.getElementById('inputDesc').value='';
+    document.getElementById('inputAmount').value='';
     toast('추가 완료 ✓');
     await render();
   }
 
   async function deleteTransaction(id) {
     loading(true);
-    const { error } = await db.from('transactions').delete().eq('id', id);
-    if (error) { loading(false); toast('삭제 실패: ' + error.message, true); return; }
-    delete trendCache[ym(currentYear, currentMonth)];
+    const {error}=await db.from('transactions').delete().eq('id',id);
+    if(error){loading(false);toast('삭제 실패',true);return;}
+    delete trendCache[ym(currentYear,currentMonth)];
     toast('삭제됨');
     await render();
   }
