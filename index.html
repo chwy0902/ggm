@@ -538,7 +538,7 @@
     if (trendCache[key]) return trendCache[key];
 
     const start = `${key}-01`;
-    const end   = `${key}-31`;
+    const end   = new Date(y, m, 0).toISOString().slice(0, 10); // 해당 월의 마지막 날
     const { data, error } = await db
       .from('transactions')
       .select('*')
