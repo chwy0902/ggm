@@ -1,0 +1,7 @@
+.vercel
+.DS_Store
+.claude/
+.mcp.json
+.agents/
+skills-lock.json
+*.pdf
