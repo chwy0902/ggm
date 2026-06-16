@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import DeleteButton from './DeleteButton'
+import LikeButton from './LikeButton'
+import CommentSection, { type Comment } from './CommentSection'
 
 const CATEGORY_EMOJI: Record<string, string> = {
   '디지털기기': '📱', '의류/잡화': '👗', '가구/인테리어': '🛋️',
@@ -40,6 +42,42 @@ export default async function ProductDetailPage({
 
   const seller = Array.isArray(product.seller) ? product.seller[0] : product.seller
   const isMine = user?.id === product.seller_id
+
+  // 좋아요 개수 + 내가 눌렀는지 여부
+  const { count: likeCount } = await supabase
+    .from('likes')
+    .select('*', { count: 'exact', head: true })
+    .eq('product_id', product.id)
+
+  let likedByMe = false
+  if (user) {
+    const { data: myLike } = await supabase
+      .from('likes')
+      .select('id')
+      .eq('product_id', product.id)
+      .eq('user_id', user.id)
+      .maybeSingle()
+    likedByMe = !!myLike
+  }
+
+  // 댓글 목록 (작성자 이름 포함, 오래된 순)
+  const { data: commentRows } = await supabase
+    .from('comments')
+    .select('id, content, created_at, updated_at, user_id, author:profiles(username)')
+    .eq('product_id', product.id)
+    .order('created_at', { ascending: true })
+
+  const comments: Comment[] = (commentRows ?? []).map((row) => {
+    const profile = Array.isArray(row.author) ? row.author[0] : row.author
+    return {
+      id: row.id,
+      content: row.content,
+      created_at: row.created_at,
+      updated_at: row.updated_at,
+      user_id: row.user_id,
+      author: profile?.username ?? '알 수 없음',
+    }
+  })
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
@@ -137,26 +175,41 @@ export default async function ProductDetailPage({
             <p className="text-xs text-gray-400 mb-0.5">판매가격</p>
             <p className="text-2xl font-extrabold text-gray-900">{formatPrice(product.price)}</p>
           </div>
-          {isMine ? (
-            <div className="flex gap-2">
-              <DeleteButton productId={product.id} />
-              <Link
-                href={`/products/${product.id}/edit`}
-                className="flex-1 py-3 rounded-xl font-bold text-sm text-center border-2 transition-colors"
-                style={{ borderColor: '#FF6B35', color: '#FF6B35' }}
+          <div className="flex items-center gap-2">
+            <LikeButton
+              productId={product.id}
+              initialLiked={likedByMe}
+              initialCount={likeCount ?? 0}
+              isLoggedIn={!!user}
+            />
+            {isMine ? (
+              <div className="flex gap-2 flex-1">
+                <DeleteButton productId={product.id} />
+                <Link
+                  href={`/products/${product.id}/edit`}
+                  className="flex-1 py-3 rounded-xl font-bold text-sm text-center border-2 transition-colors"
+                  style={{ borderColor: '#FF6B35', color: '#FF6B35' }}
+                >
+                  수정하기
+                </Link>
+              </div>
+            ) : (
+              <button
+                className="flex-1 py-3 rounded-xl font-bold text-sm text-white transition-colors"
+                style={{ backgroundColor: '#FF6B35' }}
               >
-                수정하기
-              </Link>
-            </div>
-          ) : (
-            <button
-              className="w-full py-3 rounded-xl font-bold text-sm text-white transition-colors"
-              style={{ backgroundColor: '#FF6B35' }}
-            >
-              채팅하기
-            </button>
-          )}
+                채팅하기
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* 댓글 */}
+        <CommentSection
+          productId={product.id}
+          comments={comments}
+          currentUserId={user?.id ?? null}
+        />
       </main>
     </div>
   )
