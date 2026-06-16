@@ -31,7 +31,7 @@ export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // 비로그인 상태에서 보호 경로 접근 시 로그인 페이지로
-  const protectedPaths = ['/profile', '/sell', '/chat', '/products/new']
+  const protectedPaths = ['/profile', '/chat', '/products/new']
   const isProtected = protectedPaths.some(path => pathname.startsWith(path))
 
   if (!user && isProtected) {
