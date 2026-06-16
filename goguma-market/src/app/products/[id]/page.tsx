@@ -5,6 +5,7 @@ import Image from 'next/image'
 import DeleteButton from './DeleteButton'
 import LikeButton from './LikeButton'
 import CommentSection, { type Comment } from './CommentSection'
+import Avatar from '@/components/Avatar'
 
 function formatPrice(price: number) {
   if (price === 0) return '무료나눔'
@@ -29,7 +30,7 @@ export default async function ProductDetailPage({
 
   const { data: product } = await supabase
     .from('products')
-    .select('*, seller:profiles(username, manner_temperature)')
+    .select('*, seller:profiles(username, manner_temperature, avatar_url, bio)')
     .eq('id', id)
     .single()
 
@@ -130,22 +131,32 @@ export default async function ProductDetailPage({
             {formatDate(product.created_at)}
           </p>
 
-          {/* 판매자 */}
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#111] flex items-center justify-center text-sm font-medium text-white">
-                {seller?.username?.[0] ?? '?'}
+          {/* 판매자 (클릭 시 글 모아보기) */}
+          <Link
+            href={`/sellers/${product.seller_id}`}
+            className="block border border-[#e5e5e5] p-5 mb-8 hover:border-[#111] transition-colors"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Avatar url={seller?.avatar_url} name={seller?.username} size={44} />
+                <div>
+                  <p className="text-sm text-[#111]">{seller?.username ?? '알 수 없음'}</p>
+                  <p className="text-[11px] tracking-wide-sm uppercase text-[#a3a3a3]">Seller</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-[#111]">{seller?.username ?? '알 수 없음'}</p>
-                <p className="text-[11px] tracking-wide-sm uppercase text-[#a3a3a3]">Seller</p>
+              <div className="text-right">
+                <p className="text-[11px] tracking-wide-sm uppercase text-[#a3a3a3]">매너온도</p>
+                <p className="text-base font-medium text-[#111]">{seller?.manner_temperature ?? 36.5}°</p>
               </div>
             </div>
-            <div className="text-right">
-              <p className="text-[11px] tracking-wide-sm uppercase text-[#a3a3a3]">매너온도</p>
-              <p className="text-base font-medium text-[#111]">{seller?.manner_temperature ?? 36.5}°</p>
-            </div>
-          </div>
+            {seller?.bio && (
+              <p className="text-sm text-[#717171] leading-relaxed mt-4">{seller.bio}</p>
+            )}
+            <p className="text-[11px] tracking-wide-sm uppercase text-[#111] mt-4 flex items-center gap-1">
+              이 판매자의 다른 상품 보기
+              <span aria-hidden>→</span>
+            </p>
+          </Link>
 
           {/* 설명 */}
           <div className="mb-8 pb-8 border-b border-[#e5e5e5]">
