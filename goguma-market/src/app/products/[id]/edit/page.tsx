@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { updateProduct } from '@/app/products/actions'
 
@@ -24,7 +24,6 @@ export default function EditProductPage({
 }: {
   params: Promise<{ id: string }>
 }) {
-  const router = useRouter()
   const [productId, setProductId] = useState<number | null>(null)
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -34,6 +33,13 @@ export default function EditProductPage({
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
+
+  // 이미지 관련 상태
+  const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [removeExistingImage, setRemoveExistingImage] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   function formatPrice(value: string) {
     const num = value.replace(/[^0-9]/g, '')
@@ -49,7 +55,7 @@ export default function EditProductPage({
       const supabase = createClient()
       const { data: product } = await supabase
         .from('products')
-        .select('title, description, price, category, status')
+        .select('title, description, price, category, status, image_url')
         .eq('id', numId)
         .single()
 
@@ -59,14 +65,39 @@ export default function EditProductPage({
         setPriceValue(product.price === 0 ? '0' : product.price.toLocaleString('ko-KR'))
         setSelectedCategory(product.category)
         setSelectedStatus(product.status)
+        setExistingImageUrl(product.image_url ?? null)
       }
       setFetching(false)
     }
     load()
   }, [params])
 
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      setError('이미지는 5MB 이하만 업로드할 수 있어요.')
+      return
+    }
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+    setRemoveExistingImage(true)
+    setError(null)
+  }
+
+  function handleRemoveImage() {
+    setImageFile(null)
+    setImagePreview(null)
+    setRemoveExistingImage(true)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  // 현재 표시할 이미지: 새 파일 미리보기 > 기존 이미지(삭제 안 한 경우) > 없음
+  const displayImage = imagePreview ?? (removeExistingImage ? null : existingImageUrl)
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    const form = e.currentTarget  // await 이전에 저장 (이후엔 null이 됨)
     setError(null)
 
     if (!selectedCategory) {
@@ -75,10 +106,46 @@ export default function EditProductPage({
     }
 
     setLoading(true)
-    const formData = new FormData(e.currentTarget)
+
+    let uploadedUrl: string | null = null
+
+    if (imageFile) {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setError('로그인이 필요합니다.')
+        setLoading(false)
+        return
+      }
+      const ext = imageFile.name.split('.').pop()
+      const path = `${user.id}/${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(path, imageFile)
+      if (uploadError) {
+        setError('이미지 업로드에 실패했습니다. 다시 시도해주세요.')
+        setLoading(false)
+        return
+      }
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(path)
+      uploadedUrl = publicUrl
+    }
+
+    const formData = new FormData(form)
     formData.set('price', priceValue.replace(/,/g, ''))
     formData.set('category', selectedCategory)
     formData.set('status', selectedStatus)
+
+    // 새 이미지가 있으면 새 URL, 기존 이미지 삭제했으면 빈 문자열(null로 처리), 그 외엔 기존 URL 유지
+    if (uploadedUrl) {
+      formData.set('image_url', uploadedUrl)
+    } else if (removeExistingImage) {
+      formData.set('image_url', '')
+    } else if (existingImageUrl) {
+      formData.set('image_url', existingImageUrl)
+    }
 
     const result = await updateProduct(productId!, formData)
 
@@ -139,6 +206,62 @@ export default function EditProductPage({
                 </button>
               ))}
             </div>
+          </div>
+
+          {/* 이미지 */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <label className="block text-sm font-bold text-gray-700 mb-3">
+              사진 <span className="text-xs font-normal text-gray-400">(선택, 최대 5MB)</span>
+            </label>
+
+            {displayImage ? (
+              <div className="relative w-full rounded-xl overflow-hidden" style={{ height: '220px' }}>
+                <Image
+                  src={displayImage}
+                  alt="상품 이미지"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute top-2 right-2 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-3 py-1.5 rounded-full bg-black/50 text-white text-xs font-medium hover:bg-black/70 transition-colors"
+                  >
+                    변경
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-orange-300 hover:text-orange-400 transition-colors"
+                style={{ height: '140px' }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                </svg>
+                <span className="text-sm">사진 추가하기</span>
+              </button>
+            )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
           </div>
 
           {/* 제목 */}

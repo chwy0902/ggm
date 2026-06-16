@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import DeleteButton from './DeleteButton'
 
 const CATEGORY_EMOJI: Record<string, string> = {
@@ -57,14 +58,25 @@ export default async function ProductDetailPage({
 
       <main className="max-w-screen-md mx-auto w-full px-4 py-6 space-y-4">
 
-        {/* 상품 이미지 자리 (카테고리 이모지) */}
+        {/* 상품 이미지 */}
         <div
-          className="w-full rounded-2xl flex items-center justify-center"
-          style={{ backgroundColor: '#fff5f0', height: '220px' }}
+          className="w-full rounded-2xl overflow-hidden flex items-center justify-center"
+          style={{ backgroundColor: '#fff5f0', height: '280px' }}
         >
-          <span style={{ fontSize: '80px' }}>
-            {CATEGORY_EMOJI[product.category] ?? '✨'}
-          </span>
+          {product.image_url ? (
+            <div className="relative w-full h-full">
+              <Image
+                src={product.image_url}
+                alt={product.title}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ) : (
+            <span style={{ fontSize: '80px' }}>
+              {CATEGORY_EMOJI[product.category] ?? '✨'}
+            </span>
+          )}
         </div>
 
         {/* 판매자 정보 */}

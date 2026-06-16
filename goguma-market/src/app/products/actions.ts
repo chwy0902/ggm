@@ -20,12 +20,15 @@ export async function createProduct(formData: FormData) {
     return { error: '필수 항목을 모두 입력해주세요.' }
   }
 
+  const image_url = formData.get('image_url') as string | null
+
   const { error } = await supabase.from('products').insert({
     seller_id: user.id,
     title,
     description,
     price,
     category,
+    image_url: image_url || null,
   })
 
   if (error) {
@@ -51,9 +54,11 @@ export async function updateProduct(id: number, formData: FormData) {
     return { error: '필수 항목을 모두 입력해주세요.' }
   }
 
+  const image_url = formData.get('image_url') as string | null
+
   const { error } = await supabase
     .from('products')
-    .update({ title, description, price, category, status })
+    .update({ title, description, price, category, status, image_url: image_url || null })
     .eq('id', id)
     .eq('seller_id', user.id)
 

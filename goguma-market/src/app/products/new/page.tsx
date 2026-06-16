@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
+import { createClient } from '@/lib/supabase/client'
 import { createProduct } from '@/app/products/actions'
 
 const CATEGORIES = [
@@ -17,19 +18,40 @@ const CATEGORIES = [
 ]
 
 export default function NewProductPage() {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState('')
   const [priceValue, setPriceValue] = useState('')
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   function formatPrice(value: string) {
     const num = value.replace(/[^0-9]/g, '')
     return num ? parseInt(num).toLocaleString('ko-KR') : ''
   }
 
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      setError('이미지는 5MB 이하만 업로드할 수 있어요.')
+      return
+    }
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+    setError(null)
+  }
+
+  function removeImage() {
+    setImageFile(null)
+    setImagePreview(null)
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
+    const form = e.currentTarget  // await 이전에 저장 (이후엔 null이 됨)
     setError(null)
 
     if (!selectedCategory) {
@@ -38,11 +60,37 @@ export default function NewProductPage() {
     }
 
     setLoading(true)
-    const formData = new FormData(e.currentTarget)
-    // 가격에서 쉼표 제거 후 저장
-    const rawPrice = priceValue.replace(/,/g, '')
-    formData.set('price', rawPrice)
+
+    let uploadedUrl: string | null = null
+
+    if (imageFile) {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) {
+        setError('로그인이 필요합니다.')
+        setLoading(false)
+        return
+      }
+      const ext = imageFile.name.split('.').pop()
+      const path = `${user.id}/${Date.now()}.${ext}`
+      const { error: uploadError } = await supabase.storage
+        .from('product-images')
+        .upload(path, imageFile)
+      if (uploadError) {
+        setError('이미지 업로드에 실패했습니다. 다시 시도해주세요.')
+        setLoading(false)
+        return
+      }
+      const { data: { publicUrl } } = supabase.storage
+        .from('product-images')
+        .getPublicUrl(path)
+      uploadedUrl = publicUrl
+    }
+
+    const formData = new FormData(form)
+    formData.set('price', priceValue.replace(/,/g, ''))
     formData.set('category', selectedCategory)
+    if (uploadedUrl) formData.set('image_url', uploadedUrl)
 
     const result = await createProduct(formData)
 
@@ -54,7 +102,6 @@ export default function NewProductPage() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
-      {/* 상단 헤더 */}
       <header style={{ backgroundColor: '#FF6B35' }} className="sticky top-0 z-50 shadow-md">
         <div className="max-w-screen-md mx-auto px-4 h-14 flex items-center justify-between">
           <Link href="/" className="text-white/90 hover:text-white transition-colors">
@@ -70,12 +117,58 @@ export default function NewProductPage() {
       <main className="max-w-screen-md mx-auto w-full px-4 py-6">
         <form onSubmit={handleSubmit} className="space-y-4">
 
-          {/* 오류 메시지 */}
           {error && (
             <div className="px-4 py-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
               {error}
             </div>
           )}
+
+          {/* 이미지 업로드 */}
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+            <label className="block text-sm font-bold text-gray-700 mb-3">
+              사진 <span className="text-xs font-normal text-gray-400">(선택, 최대 5MB)</span>
+            </label>
+
+            {imagePreview ? (
+              <div className="relative w-full rounded-xl overflow-hidden" style={{ height: '220px' }}>
+                <Image
+                  src={imagePreview}
+                  alt="업로드 미리보기"
+                  fill
+                  className="object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={removeImage}
+                  className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-orange-300 hover:text-orange-400 transition-colors"
+                style={{ height: '140px' }}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
+                </svg>
+                <span className="text-sm">사진 추가하기</span>
+              </button>
+            )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleImageChange}
+            />
+          </div>
 
           {/* 제목 */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
@@ -150,9 +243,7 @@ export default function NewProductPage() {
 
           {/* 내용 */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              내용
-            </label>
+            <label className="block text-sm font-bold text-gray-700 mb-2">내용</label>
             <textarea
               name="description"
               rows={6}
@@ -163,7 +254,6 @@ export default function NewProductPage() {
             />
           </div>
 
-          {/* 등록 버튼 */}
           <button
             type="submit"
             disabled={loading}
