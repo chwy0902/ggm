@@ -22,81 +22,56 @@ export default function LoginPage() {
     }
   }
 
+  const inputClass = "w-full px-4 py-3 border border-[#d4d4d4] text-sm text-[#111] placeholder-[#a3a3a3] focus:outline-none focus:border-[#111] transition-colors bg-white"
+  const labelClass = "block text-xs tracking-wide-sm uppercase text-[#717171] mb-2"
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: '#f5f5f5' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-5 bg-white">
       <div className="w-full max-w-sm">
         {/* 로고 */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex flex-col items-center gap-2">
-            <span className="text-5xl">🍠</span>
-            <span className="text-2xl font-bold" style={{ color: '#FF6B35' }}>고구마마켓</span>
+        <div className="text-center mb-12">
+          <Link href="/" className="inline-block">
+            <span className="text-2xl font-semibold tracking-luxe text-[#111]">GOGUMA</span>
           </Link>
-          <p className="text-gray-500 text-sm mt-2">우리 동네 중고거래</p>
+          <p className="text-[11px] tracking-wide-sm uppercase text-[#a3a3a3] mt-3">Pre-loved Marketplace</p>
         </div>
 
-        {/* 카드 */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <h1 className="text-xl font-bold text-gray-900 mb-6">로그인</h1>
+        <h1 className="text-xs tracking-luxe uppercase text-[#111] mb-8 text-center">Login</h1>
 
-          {error && (
-            <div className="mb-4 px-4 py-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
-              {error === 'Invalid login credentials'
-                ? '이메일 또는 비밀번호가 올바르지 않습니다.'
-                : error}
-            </div>
-          )}
+        {error && (
+          <div className="mb-6 px-4 py-3 border border-[#111] text-[#111] text-sm">
+            {error === 'Invalid login credentials'
+              ? '이메일 또는 비밀번호가 올바르지 않습니다.'
+              : error}
+          </div>
+        )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                이메일
-              </label>
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="hello@example.com"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent text-sm transition-all"
-                style={{ '--tw-ring-color': '#FF6B35' } as React.CSSProperties}
-                onFocus={e => e.target.style.borderColor = '#FF6B35'}
-                onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className={labelClass}>이메일</label>
+            <input type="email" name="email" required placeholder="hello@example.com" className={inputClass} />
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                비밀번호
-              </label>
-              <input
-                type="password"
-                name="password"
-                required
-                placeholder="비밀번호를 입력하세요"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none text-sm transition-all"
-                onFocus={e => e.target.style.borderColor = '#FF6B35'}
-                onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-              />
-            </div>
+          <div>
+            <label className={labelClass}>비밀번호</label>
+            <input type="password" name="password" required placeholder="비밀번호를 입력하세요" className={inputClass} />
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl font-bold text-white text-sm transition-all mt-2 disabled:opacity-60"
-              style={{ backgroundColor: loading ? '#ffb899' : '#FF6B35' }}
-              onMouseEnter={e => { if (!loading) (e.target as HTMLButtonElement).style.backgroundColor = '#E55A25' }}
-              onMouseLeave={e => { if (!loading) (e.target as HTMLButtonElement).style.backgroundColor = '#FF6B35' }}
-            >
-              {loading ? '로그인 중...' : '로그인'}
-            </button>
-          </form>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#111] text-white text-xs tracking-wide-sm uppercase py-4 hover:bg-[#333] transition-colors disabled:opacity-50"
+          >
+            {loading ? '로그인 중...' : 'Login'}
+          </button>
+        </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
-            아직 계정이 없으신가요?{' '}
-            <Link href="/signup" className="font-semibold" style={{ color: '#FF6B35' }}>
-              회원가입
-            </Link>
-          </p>
-        </div>
+        <p className="text-center text-xs text-[#717171] mt-8">
+          아직 계정이 없으신가요?{' '}
+          <Link href="/signup" className="text-[#111] underline underline-offset-2">
+            회원가입
+          </Link>
+        </p>
       </div>
     </div>
   )

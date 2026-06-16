@@ -14,20 +14,19 @@ export default function DeleteButton({ productId }: { productId: number }) {
 
   if (confirm) {
     return (
-      <div className="flex gap-2">
+      <div className="flex-1 flex gap-3">
         <button
           onClick={() => setConfirm(false)}
-          className="flex-1 py-3 rounded-xl font-bold text-sm border border-gray-200 text-gray-500 transition-colors"
+          className="flex-1 border border-[#111] text-[#111] text-xs tracking-wide-sm uppercase py-4 hover:bg-[#fafafa] transition-colors"
         >
-          취소
+          Cancel
         </button>
         <button
           onClick={handleDelete}
           disabled={loading}
-          className="flex-1 py-3 rounded-xl font-bold text-sm text-white transition-colors disabled:opacity-60"
-          style={{ backgroundColor: '#ef4444' }}
+          className="flex-1 bg-[#111] text-white text-xs tracking-wide-sm uppercase py-4 disabled:opacity-50 hover:bg-[#333] transition-colors"
         >
-          {loading ? '삭제 중...' : '삭제 확인'}
+          {loading ? '삭제 중' : 'Confirm'}
         </button>
       </div>
     )
@@ -36,9 +35,9 @@ export default function DeleteButton({ productId }: { productId: number }) {
   return (
     <button
       onClick={() => setConfirm(true)}
-      className="px-5 py-3 rounded-xl font-bold text-sm border border-gray-200 text-gray-500 transition-colors hover:border-red-200 hover:text-red-500"
+      className="flex-1 border border-[#111] text-[#111] text-xs tracking-wide-sm uppercase py-4 hover:bg-[#fafafa] transition-colors"
     >
-      삭제
+      Delete
     </button>
   )
 }

@@ -45,134 +45,84 @@ export default function SignupPage() {
     }
   }
 
+  const inputClass = "w-full px-4 py-3 border border-[#d4d4d4] text-sm text-[#111] placeholder-[#a3a3a3] focus:outline-none focus:border-[#111] transition-colors bg-white"
+  const labelClass = "block text-xs tracking-wide-sm uppercase text-[#717171] mb-2"
+
   if (success) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: '#f5f5f5' }}>
-        <div className="w-full max-w-sm">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center">
-            <div className="text-5xl mb-4">📬</div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">이메일을 확인해주세요</h2>
-            <p className="text-gray-500 text-sm leading-relaxed">
-              가입하신 이메일로 인증 링크를 보냈습니다.<br />
-              이메일을 확인하고 인증을 완료해주세요.
-            </p>
-            <Link
-              href="/login"
-              className="mt-6 inline-block w-full py-3 rounded-xl font-bold text-white text-sm text-center"
-              style={{ backgroundColor: '#FF6B35' }}
-            >
-              로그인 하러 가기
-            </Link>
-          </div>
+      <div className="min-h-screen flex flex-col items-center justify-center px-5 bg-white">
+        <div className="w-full max-w-sm text-center border border-[#111] p-10">
+          <h2 className="text-xs tracking-luxe uppercase text-[#111] mb-4">Check Your Email</h2>
+          <p className="text-sm text-[#717171] leading-relaxed">
+            가입하신 이메일로 인증 링크를 보냈습니다.<br />
+            이메일을 확인하고 인증을 완료해주세요.
+          </p>
+          <Link
+            href="/login"
+            className="mt-8 inline-block w-full bg-[#111] text-white text-xs tracking-wide-sm uppercase py-4 hover:bg-[#333] transition-colors"
+          >
+            Go to Login
+          </Link>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ backgroundColor: '#f5f5f5' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-5 bg-white py-12">
       <div className="w-full max-w-sm">
         {/* 로고 */}
-        <div className="text-center mb-8">
-          <Link href="/" className="inline-flex flex-col items-center gap-2">
-            <span className="text-5xl">🍠</span>
-            <span className="text-2xl font-bold" style={{ color: '#FF6B35' }}>고구마마켓</span>
+        <div className="text-center mb-12">
+          <Link href="/" className="inline-block">
+            <span className="text-2xl font-semibold tracking-luxe text-[#111]">GOGUMA</span>
           </Link>
-          <p className="text-gray-500 text-sm mt-2">우리 동네 중고거래</p>
+          <p className="text-[11px] tracking-wide-sm uppercase text-[#a3a3a3] mt-3">Pre-loved Marketplace</p>
         </div>
 
-        {/* 카드 */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <h1 className="text-xl font-bold text-gray-900 mb-6">회원가입</h1>
+        <h1 className="text-xs tracking-luxe uppercase text-[#111] mb-8 text-center">Join</h1>
 
-          {error && (
-            <div className="mb-4 px-4 py-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
-              {error}
-            </div>
-          )}
+        {error && (
+          <div className="mb-6 px-4 py-3 border border-[#111] text-[#111] text-sm">
+            {error}
+          </div>
+        )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                닉네임
-              </label>
-              <input
-                type="text"
-                name="username"
-                required
-                placeholder="고구마왕"
-                minLength={2}
-                maxLength={20}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none text-sm transition-all"
-                onFocus={e => e.target.style.borderColor = '#FF6B35'}
-                onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <div>
+            <label className={labelClass}>닉네임</label>
+            <input type="text" name="username" required placeholder="고구마왕" minLength={2} maxLength={20} className={inputClass} />
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                이메일
-              </label>
-              <input
-                type="email"
-                name="email"
-                required
-                placeholder="hello@example.com"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none text-sm transition-all"
-                onFocus={e => e.target.style.borderColor = '#FF6B35'}
-                onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-              />
-            </div>
+          <div>
+            <label className={labelClass}>이메일</label>
+            <input type="email" name="email" required placeholder="hello@example.com" className={inputClass} />
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                비밀번호
-              </label>
-              <input
-                type="password"
-                name="password"
-                required
-                placeholder="6자 이상"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none text-sm transition-all"
-                onFocus={e => e.target.style.borderColor = '#FF6B35'}
-                onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-              />
-            </div>
+          <div>
+            <label className={labelClass}>비밀번호</label>
+            <input type="password" name="password" required placeholder="6자 이상" className={inputClass} />
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                비밀번호 확인
-              </label>
-              <input
-                type="password"
-                name="confirmPassword"
-                required
-                placeholder="비밀번호를 다시 입력하세요"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none text-sm transition-all"
-                onFocus={e => e.target.style.borderColor = '#FF6B35'}
-                onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-              />
-            </div>
+          <div>
+            <label className={labelClass}>비밀번호 확인</label>
+            <input type="password" name="confirmPassword" required placeholder="비밀번호를 다시 입력하세요" className={inputClass} />
+          </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl font-bold text-white text-sm transition-all mt-2 disabled:opacity-60"
-              style={{ backgroundColor: loading ? '#ffb899' : '#FF6B35' }}
-              onMouseEnter={e => { if (!loading) (e.target as HTMLButtonElement).style.backgroundColor = '#E55A25' }}
-              onMouseLeave={e => { if (!loading) (e.target as HTMLButtonElement).style.backgroundColor = '#FF6B35' }}
-            >
-              {loading ? '가입 중...' : '가입하기'}
-            </button>
-          </form>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-[#111] text-white text-xs tracking-wide-sm uppercase py-4 hover:bg-[#333] transition-colors disabled:opacity-50"
+          >
+            {loading ? '가입 중...' : 'Create Account'}
+          </button>
+        </form>
 
-          <p className="text-center text-sm text-gray-500 mt-6">
-            이미 계정이 있으신가요?{' '}
-            <Link href="/login" className="font-semibold" style={{ color: '#FF6B35' }}>
-              로그인
-            </Link>
-          </p>
-        </div>
+        <p className="text-center text-xs text-[#717171] mt-8">
+          이미 계정이 있으신가요?{' '}
+          <Link href="/login" className="text-[#111] underline underline-offset-2">
+            로그인
+          </Link>
+        </p>
       </div>
     </div>
   )

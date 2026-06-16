@@ -6,11 +6,6 @@ import DeleteButton from './DeleteButton'
 import LikeButton from './LikeButton'
 import CommentSection, { type Comment } from './CommentSection'
 
-const CATEGORY_EMOJI: Record<string, string> = {
-  '디지털기기': '📱', '의류/잡화': '👗', '가구/인테리어': '🛋️',
-  '도서': '📚', '게임/취미': '🎮', '주방용품': '🍳', '스포츠': '🚲', '기타': '✨',
-}
-
 function formatPrice(price: number) {
   if (price === 0) return '무료나눔'
   return price.toLocaleString('ko-KR') + '원'
@@ -80,137 +75,126 @@ export default async function ProductDetailPage({
   })
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
+    <div className="min-h-screen bg-white">
       {/* 상단 헤더 */}
-      <header style={{ backgroundColor: '#FF6B35' }} className="sticky top-0 z-50 shadow-md">
-        <div className="max-w-screen-md mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href="/" className="text-white/90 hover:text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+      <header className="sticky top-0 z-50 bg-white border-b border-[#111]">
+        <div className="max-w-screen-lg mx-auto px-5 h-16 flex items-center justify-between">
+          <Link href="/" className="text-[#111] hover:opacity-60 transition-opacity">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
             </svg>
           </Link>
-          <span className="text-white font-bold text-base">판매글</span>
-          <div className="w-6" />
+          <span className="text-[#111] font-semibold tracking-luxe text-sm">GOGUMA</span>
+          <div className="w-5" />
         </div>
       </header>
 
-      <main className="max-w-screen-md mx-auto w-full px-4 py-6 space-y-4">
+      <main className="max-w-screen-lg mx-auto w-full px-5 py-10 grid md:grid-cols-2 gap-10">
 
-        {/* 상품 이미지 */}
-        <div
-          className="w-full rounded-2xl overflow-hidden flex items-center justify-center"
-          style={{ backgroundColor: '#fff5f0', height: '280px' }}
-        >
+        {/* 왼쪽: 상품 이미지 */}
+        <div className="relative w-full aspect-square bg-[#f5f5f5] overflow-hidden">
           {product.image_url ? (
-            <div className="relative w-full h-full">
-              <Image
-                src={product.image_url}
-                alt={product.title}
-                fill
-                className="object-cover"
-              />
-            </div>
+            <Image
+              src={product.image_url}
+              alt={product.title}
+              fill
+              className="object-cover"
+            />
           ) : (
-            <span style={{ fontSize: '80px' }}>
-              {CATEGORY_EMOJI[product.category] ?? '✨'}
-            </span>
+            <div className="w-full h-full flex items-center justify-center">
+              <span className="text-xs tracking-luxe uppercase text-[#a3a3a3]">
+                {product.category}
+              </span>
+            </div>
           )}
         </div>
 
-        {/* 판매자 정보 */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center text-lg font-bold text-white"
-              style={{ backgroundColor: '#FF6B35' }}
-            >
-              {seller?.username?.[0] ?? '?'}
-            </div>
-            <div>
-              <p className="font-bold text-gray-900 text-sm">{seller?.username ?? '알 수 없음'}</p>
-              <p className="text-xs text-gray-400">판매자</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-xs text-gray-400 mb-0.5">매너온도</p>
-            <p className="text-lg font-extrabold" style={{ color: '#FF6B35' }}>
-              {seller?.manner_temperature ?? 36.5}°
-            </p>
-          </div>
-        </div>
-
-        {/* 상품 정보 */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-          <div className="flex items-start justify-between gap-2 mb-3">
-            <h1 className="text-lg font-bold text-gray-900 leading-snug">{product.title}</h1>
+        {/* 오른쪽: 정보 */}
+        <div className="flex flex-col">
+          {/* 카테고리 + 상태 */}
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-xs tracking-wide-sm uppercase text-[#a3a3a3]">{product.category}</p>
             {product.status !== '판매중' && (
-              <span
-                className="flex-shrink-0 text-xs font-medium px-2.5 py-1 rounded-full"
-                style={{
-                  backgroundColor: product.status === '예약중' ? '#fef3c7' : '#f3f4f6',
-                  color: product.status === '예약중' ? '#d97706' : '#6b7280',
-                }}
-              >
+              <span className="bg-[#111] text-white text-[10px] tracking-wide-sm uppercase px-2.5 py-1">
                 {product.status}
               </span>
             )}
           </div>
 
-          <p className="text-xs text-gray-400 mb-4">
-            {product.category} · {formatDate(product.created_at)}
+          {/* 제목 + 가격 */}
+          <h1 className="text-2xl font-light tracking-tight text-[#111] leading-snug mb-3">
+            {product.title}
+          </h1>
+          <p className="text-xl font-medium text-[#111] mb-6">{formatPrice(product.price)}</p>
+          <p className="text-[11px] tracking-wide-sm uppercase text-[#a3a3a3] mb-8 pb-8 border-b border-[#e5e5e5]">
+            {formatDate(product.created_at)}
           </p>
 
-          {product.description ? (
-            <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
-              {product.description}
-            </p>
-          ) : (
-            <p className="text-sm text-gray-400 italic">내용이 없습니다.</p>
-          )}
-        </div>
-
-        {/* 가격 + 버튼 */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-          <div className="mb-4">
-            <p className="text-xs text-gray-400 mb-0.5">판매가격</p>
-            <p className="text-2xl font-extrabold text-gray-900">{formatPrice(product.price)}</p>
+          {/* 판매자 */}
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-[#111] flex items-center justify-center text-sm font-medium text-white">
+                {seller?.username?.[0] ?? '?'}
+              </div>
+              <div>
+                <p className="text-sm text-[#111]">{seller?.username ?? '알 수 없음'}</p>
+                <p className="text-[11px] tracking-wide-sm uppercase text-[#a3a3a3]">Seller</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="text-[11px] tracking-wide-sm uppercase text-[#a3a3a3]">매너온도</p>
+              <p className="text-base font-medium text-[#111]">{seller?.manner_temperature ?? 36.5}°</p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
+
+          {/* 설명 */}
+          <div className="mb-8 pb-8 border-b border-[#e5e5e5]">
+            {product.description ? (
+              <p className="text-sm text-[#444] leading-relaxed whitespace-pre-wrap">
+                {product.description}
+              </p>
+            ) : (
+              <p className="text-sm text-[#a3a3a3] italic">상세 설명이 없습니다.</p>
+            )}
+          </div>
+
+          {/* 액션 버튼 */}
+          {isMine ? (
+            <div className="flex gap-3">
+              <Link
+                href={`/products/${product.id}/edit`}
+                className="flex-1 text-center border border-[#111] text-[#111] text-xs tracking-wide-sm uppercase py-4 hover:bg-[#111] hover:text-white transition-colors"
+              >
+                Edit
+              </Link>
+              <DeleteButton productId={product.id} />
+            </div>
+          ) : (
+            <button className="w-full bg-[#111] text-white text-xs tracking-wide-sm uppercase py-4 hover:bg-[#333] transition-colors">
+              채팅하기
+            </button>
+          )}
+
+          {/* 좋아요 */}
+          <div className="mt-4">
             <LikeButton
               productId={product.id}
               initialLiked={likedByMe}
               initialCount={likeCount ?? 0}
               isLoggedIn={!!user}
             />
-            {isMine ? (
-              <div className="flex gap-2 flex-1">
-                <DeleteButton productId={product.id} />
-                <Link
-                  href={`/products/${product.id}/edit`}
-                  className="flex-1 py-3 rounded-xl font-bold text-sm text-center border-2 transition-colors"
-                  style={{ borderColor: '#FF6B35', color: '#FF6B35' }}
-                >
-                  수정하기
-                </Link>
-              </div>
-            ) : (
-              <button
-                className="flex-1 py-3 rounded-xl font-bold text-sm text-white transition-colors"
-                style={{ backgroundColor: '#FF6B35' }}
-              >
-                채팅하기
-              </button>
-            )}
           </div>
         </div>
+      </main>
 
-        {/* 댓글 */}
+      {/* 댓글 */}
+      <div className="max-w-screen-lg mx-auto w-full px-5 pb-16">
         <CommentSection
           productId={product.id}
           comments={comments}
           currentUserId={user?.id ?? null}
         />
-      </main>
+      </div>
     </div>
   )
 }

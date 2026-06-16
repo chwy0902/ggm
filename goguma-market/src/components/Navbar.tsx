@@ -7,34 +7,33 @@ export default async function Navbar() {
   const { data: { user } } = await supabase.auth.getUser()
 
   return (
-    <header style={{ backgroundColor: '#FF6B35' }} className="sticky top-0 z-50 shadow-md">
-      <div className="max-w-screen-md mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-2xl">🍠</span>
-          <span className="text-white font-bold text-lg tracking-tight">고구마마켓</span>
+    <header className="sticky top-0 z-50 bg-white border-b border-[#111]">
+      <div className="max-w-screen-lg mx-auto px-5 h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center">
+          <span className="text-[#111] font-semibold text-xl tracking-luxe">GOGUMA</span>
         </Link>
 
-        <nav className="flex items-center gap-3">
+        <nav className="flex items-center gap-5 text-xs tracking-wide-sm uppercase">
           {user ? (
             <>
               <Link
                 href="/products/new"
-                className="bg-white/20 hover:bg-white/30 text-white text-sm font-medium px-3 py-1.5 rounded-full transition-colors"
+                className="text-[#111] hover:opacity-60 transition-opacity"
               >
-                판매하기
+                Sell
               </Link>
               <Link
                 href="/profile"
-                className="text-white/90 hover:text-white text-sm font-medium transition-colors"
+                className="text-[#111] hover:opacity-60 transition-opacity"
               >
-                내 프로필
+                Account
               </Link>
               <form action={signOut}>
                 <button
                   type="submit"
-                  className="bg-white/20 hover:bg-white/30 text-white text-sm font-medium px-3 py-1.5 rounded-full transition-colors"
+                  className="text-[#717171] hover:text-[#111] transition-colors uppercase"
                 >
-                  로그아웃
+                  Logout
                 </button>
               </form>
             </>
@@ -42,15 +41,15 @@ export default async function Navbar() {
             <>
               <Link
                 href="/login"
-                className="text-white/90 hover:text-white text-sm font-medium transition-colors"
+                className="text-[#111] hover:opacity-60 transition-opacity"
               >
-                로그인
+                Login
               </Link>
               <Link
                 href="/signup"
-                className="bg-white text-[#FF6B35] text-sm font-bold px-4 py-1.5 rounded-full hover:bg-orange-50 transition-colors"
+                className="bg-[#111] text-white px-4 py-2 hover:bg-[#333] transition-colors"
               >
-                회원가입
+                Join
               </Link>
             </>
           )}

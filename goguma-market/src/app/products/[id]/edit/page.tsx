@@ -6,17 +6,7 @@ import Image from 'next/image'
 import { createClient } from '@/lib/supabase/client'
 import { updateProduct } from '@/app/products/actions'
 
-const CATEGORIES = [
-  { emoji: '📱', label: '디지털기기' },
-  { emoji: '👗', label: '의류/잡화' },
-  { emoji: '🛋️', label: '가구/인테리어' },
-  { emoji: '📚', label: '도서' },
-  { emoji: '🎮', label: '게임/취미' },
-  { emoji: '🍳', label: '주방용품' },
-  { emoji: '🚲', label: '스포츠' },
-  { emoji: '✨', label: '기타' },
-]
-
+const CATEGORIES = ['디지털기기', '의류/잡화', '가구/인테리어', '도서', '게임/취미', '주방용품', '스포츠', '기타']
 const STATUSES = ['판매중', '예약중', '거래완료']
 
 export default function EditProductPage({
@@ -34,7 +24,6 @@ export default function EditProductPage({
   const [loading, setLoading] = useState(false)
   const [fetching, setFetching] = useState(true)
 
-  // 이미지 관련 상태
   const [existingImageUrl, setExistingImageUrl] = useState<string | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
@@ -92,12 +81,11 @@ export default function EditProductPage({
     if (fileInputRef.current) fileInputRef.current.value = ''
   }
 
-  // 현재 표시할 이미지: 새 파일 미리보기 > 기존 이미지(삭제 안 한 경우) > 없음
   const displayImage = imagePreview ?? (removeExistingImage ? null : existingImageUrl)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    const form = e.currentTarget  // await 이전에 저장 (이후엔 null이 됨)
+    const form = e.currentTarget
     setError(null)
 
     if (!selectedCategory) {
@@ -138,7 +126,6 @@ export default function EditProductPage({
     formData.set('category', selectedCategory)
     formData.set('status', selectedStatus)
 
-    // 새 이미지가 있으면 새 URL, 기존 이미지 삭제했으면 빈 문자열(null로 처리), 그 외엔 기존 URL 유지
     if (uploadedUrl) {
       formData.set('image_url', uploadedUrl)
     } else if (removeExistingImage) {
@@ -155,51 +142,54 @@ export default function EditProductPage({
     }
   }
 
+  const inputClass = "w-full px-4 py-3 border border-[#d4d4d4] text-sm text-[#111] placeholder-[#a3a3a3] focus:outline-none focus:border-[#111] transition-colors bg-white"
+  const labelClass = "block text-xs tracking-wide-sm uppercase text-[#717171] mb-2"
+
   if (fetching) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#f5f5f5' }}>
-        <p className="text-gray-400 text-sm">불러오는 중...</p>
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <p className="text-[#a3a3a3] text-xs tracking-wide-sm uppercase">Loading...</p>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f5f5' }}>
-      <header style={{ backgroundColor: '#FF6B35' }} className="sticky top-0 z-50 shadow-md">
-        <div className="max-w-screen-md mx-auto px-4 h-14 flex items-center justify-between">
-          <Link href={`/products/${productId}`} className="text-white/90 hover:text-white transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+    <div className="min-h-screen bg-white">
+      <header className="sticky top-0 z-50 bg-white border-b border-[#111]">
+        <div className="max-w-screen-md mx-auto px-5 h-16 flex items-center justify-between">
+          <Link href={`/products/${productId}`} className="text-[#111] hover:opacity-60 transition-opacity">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
             </svg>
           </Link>
-          <h1 className="text-white font-bold text-base">판매글 수정</h1>
-          <div className="w-6" />
+          <h1 className="text-[#111] text-xs tracking-luxe uppercase">Edit Item</h1>
+          <div className="w-5" />
         </div>
       </header>
 
-      <main className="max-w-screen-md mx-auto w-full px-4 py-6">
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <main className="max-w-screen-md mx-auto w-full px-5 py-10">
+        <form onSubmit={handleSubmit} className="space-y-8">
 
           {error && (
-            <div className="px-4 py-3 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
+            <div className="px-4 py-3 border border-[#111] text-[#111] text-sm">
               {error}
             </div>
           )}
 
           {/* 거래 상태 */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <label className="block text-sm font-bold text-gray-700 mb-3">거래 상태</label>
+          <div>
+            <label className={labelClass}>거래 상태</label>
             <div className="flex gap-2">
               {STATUSES.map((s) => (
                 <button
                   key={s}
                   type="button"
                   onClick={() => setSelectedStatus(s)}
-                  className="flex-1 py-2 rounded-xl text-sm font-medium border transition-all"
+                  className="flex-1 py-2.5 border text-xs tracking-wide-sm transition-colors"
                   style={{
-                    borderColor: selectedStatus === s ? '#FF6B35' : '#e5e7eb',
-                    backgroundColor: selectedStatus === s ? '#fff5f0' : 'white',
-                    color: selectedStatus === s ? '#FF6B35' : '#6b7280',
+                    borderColor: '#111',
+                    backgroundColor: selectedStatus === s ? '#111' : 'white',
+                    color: selectedStatus === s ? 'white' : '#111',
                   }}
                 >
                   {s}
@@ -209,33 +199,25 @@ export default function EditProductPage({
           </div>
 
           {/* 이미지 */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <label className="block text-sm font-bold text-gray-700 mb-3">
-              사진 <span className="text-xs font-normal text-gray-400">(선택, 최대 5MB)</span>
-            </label>
-
+          <div>
+            <label className={labelClass}>사진 (선택, 최대 5MB)</label>
             {displayImage ? (
-              <div className="relative w-full rounded-xl overflow-hidden" style={{ height: '220px' }}>
-                <Image
-                  src={displayImage}
-                  alt="상품 이미지"
-                  fill
-                  className="object-cover"
-                />
-                <div className="absolute top-2 right-2 flex gap-2">
+              <div className="relative w-full aspect-square overflow-hidden bg-[#f5f5f5]">
+                <Image src={displayImage} alt="상품 이미지" fill className="object-cover" />
+                <div className="absolute top-3 right-3 flex gap-2">
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="px-3 py-1.5 rounded-full bg-black/50 text-white text-xs font-medium hover:bg-black/70 transition-colors"
+                    className="px-3 py-1.5 bg-[#111] text-white text-[11px] tracking-wide-sm uppercase hover:bg-[#333] transition-colors"
                   >
-                    변경
+                    Change
                   </button>
                   <button
                     type="button"
                     onClick={handleRemoveImage}
-                    className="w-8 h-8 rounded-full bg-black/50 flex items-center justify-center text-white hover:bg-black/70 transition-colors"
+                    className="w-8 h-8 bg-[#111] flex items-center justify-center text-white hover:bg-[#333] transition-colors"
                   >
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-4 h-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-4 h-4">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                     </svg>
                   </button>
@@ -245,73 +227,49 @@ export default function EditProductPage({
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full rounded-xl border-2 border-dashed border-gray-200 flex flex-col items-center justify-center gap-2 text-gray-400 hover:border-orange-300 hover:text-orange-400 transition-colors"
-                style={{ height: '140px' }}
+                className="w-full border border-[#d4d4d4] flex flex-col items-center justify-center gap-2 text-[#a3a3a3] hover:border-[#111] hover:text-[#111] transition-colors"
+                style={{ height: '160px' }}
               >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1} stroke="currentColor" className="w-8 h-8">
                   <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
                 </svg>
-                <span className="text-sm">사진 추가하기</span>
+                <span className="text-xs tracking-wide-sm uppercase">Add Photo</span>
               </button>
             )}
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleImageChange}
-            />
+            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
           </div>
 
           {/* 제목 */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              제목 <span style={{ color: '#FF6B35' }}>*</span>
-            </label>
-            <input
-              type="text"
-              name="title"
-              required
-              maxLength={50}
-              value={title}
-              onChange={e => setTitle(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none text-sm transition-all"
-              onFocus={e => e.target.style.borderColor = '#FF6B35'}
-              onBlur={e => e.target.style.borderColor = '#e5e7eb'}
-            />
+          <div>
+            <label className={labelClass}>제목 *</label>
+            <input type="text" name="title" required maxLength={50} value={title} onChange={e => setTitle(e.target.value)} className={inputClass} />
           </div>
 
           {/* 카테고리 */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <label className="block text-sm font-bold text-gray-700 mb-3">
-              카테고리 <span style={{ color: '#FF6B35' }}>*</span>
-            </label>
-            <div className="grid grid-cols-4 gap-2">
-              {CATEGORIES.map(({ emoji, label }) => (
+          <div>
+            <label className={labelClass}>카테고리 *</label>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((label) => (
                 <button
                   key={label}
                   type="button"
                   onClick={() => setSelectedCategory(label)}
-                  className="flex flex-col items-center gap-1.5 p-2.5 rounded-xl border text-xs font-medium transition-all"
+                  className="px-4 py-2 border text-xs tracking-wide-sm transition-colors"
                   style={{
-                    borderColor: selectedCategory === label ? '#FF6B35' : '#e5e7eb',
-                    backgroundColor: selectedCategory === label ? '#fff5f0' : 'white',
-                    color: selectedCategory === label ? '#FF6B35' : '#4b5563',
+                    borderColor: '#111',
+                    backgroundColor: selectedCategory === label ? '#111' : 'white',
+                    color: selectedCategory === label ? 'white' : '#111',
                   }}
                 >
-                  <span className="text-xl">{emoji}</span>
-                  <span className="leading-tight text-center">{label}</span>
+                  {label}
                 </button>
               ))}
             </div>
           </div>
 
           {/* 가격 */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <label className="block text-sm font-bold text-gray-700 mb-2">
-              가격 <span style={{ color: '#FF6B35' }}>*</span>
-            </label>
+          <div>
+            <label className={labelClass}>가격 *</label>
             <div className="relative">
               <input
                 type="text"
@@ -319,44 +277,38 @@ export default function EditProductPage({
                 required
                 value={priceValue}
                 onChange={e => setPriceValue(formatPrice(e.target.value))}
-                className="w-full px-4 py-3 pr-8 rounded-xl border border-gray-200 text-gray-900 focus:outline-none text-sm transition-all"
-                onFocus={e => e.target.style.borderColor = '#FF6B35'}
-                onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+                className={inputClass + " pr-8"}
               />
-              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">원</span>
+              <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[#a3a3a3] text-sm">원</span>
             </div>
             <button
               type="button"
               onClick={() => setPriceValue('0')}
-              className="mt-2 text-xs font-medium px-3 py-1.5 rounded-full border transition-colors"
-              style={{ borderColor: '#FF6B35', color: '#FF6B35' }}
+              className="mt-2 text-[11px] tracking-wide-sm uppercase px-3 py-1.5 border border-[#111] text-[#111] hover:bg-[#111] hover:text-white transition-colors"
             >
               무료나눔
             </button>
           </div>
 
           {/* 내용 */}
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
-            <label className="block text-sm font-bold text-gray-700 mb-2">내용</label>
+          <div>
+            <label className={labelClass}>내용</label>
             <textarea
               name="description"
               rows={6}
               value={description}
               onChange={e => setDescription(e.target.value)}
               placeholder="물건에 대해 자세히 알려주세요."
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none text-sm transition-all resize-none"
-              onFocus={e => e.target.style.borderColor = '#FF6B35'}
-              onBlur={e => e.target.style.borderColor = '#e5e7eb'}
+              className={inputClass + " resize-none"}
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 rounded-2xl font-bold text-white text-base transition-all disabled:opacity-60"
-            style={{ backgroundColor: loading ? '#ffb899' : '#FF6B35' }}
+            className="w-full bg-[#111] text-white text-xs tracking-wide-sm uppercase py-4 hover:bg-[#333] transition-colors disabled:opacity-50"
           >
-            {loading ? '저장 중...' : '수정 완료'}
+            {loading ? '저장 중...' : 'Save Changes'}
           </button>
         </form>
       </main>
